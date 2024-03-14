@@ -1,48 +1,174 @@
 package mr
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+)
 import "log"
 import "net/rpc"
 import "hash/fnv"
 
-
-//
 // Map functions return a slice of KeyValue.
-//
 type KeyValue struct {
 	Key   string
 	Value string
 }
 
-//
+// for sorting by key.
+type ByKey []KeyValue
+
+// for sorting by key.
+func (a ByKey) Len() int           { return len(a) }
+func (a ByKey) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByKey) Less(i, j int) bool { return a[i].Key < a[j].Key }
+
 // use ihash(key) % NReduce to choose the reduce
 // task number for each KeyValue emitted by Map.
-//
 func ihash(key string) int {
 	h := fnv.New32a()
 	h.Write([]byte(key))
 	return int(h.Sum32() & 0x7fffffff)
 }
 
-
-//
 // main/mrworker.go calls this function.
-//
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
 
 	// Your worker implementation here.
-
+	live := true
+	for live {
+		reply := CallGetTask()
+		if reply == nil {
+			continue
+		} else if reply.category == "Mapping" {
+			mapperWork(mapf, reply)
+		} else if reply.category == "Reducer" {
+			reducerWork(reducef, reply)
+		} else {
+			time.Sleep(time.Second)
+		}
+	}
 	// uncomment to send the Example RPC to the coordinator.
 	// CallExample()
 
 }
 
-//
+func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
+	// read file
+	content, err := os.ReadFile(reply.fileName)
+	if err != nil {
+		log.Fatalf("Error-01: read file %v: %v\n", reply.fileName, err)
+	}
+
+	// do map
+	intermediate := mapf(reply.fileName, string(content))
+
+	var intermediateFileNames []string
+	kvByReduce := map[int][]KeyValue{}
+	for _, kv := range intermediate {
+		key := kv.Key
+		reduceIndex := ihash(key)
+		kvByReduce[reduceIndex] = append(kvByReduce[reduceIndex], kv)
+	}
+
+	// write intermediate file
+	for k, kvs := range kvByReduce {
+		intermediateFileName := "mr-" + strconv.Itoa(reply.workerIndex) + "-" + strconv.Itoa(k)
+		tempFile, err := ioutil.TempFile(".", intermediateFileName+"-"+"temp")
+		if err != nil {
+			log.Fatalf("Error-02: fail to create temp file %v: %v\n", intermediateFileName, err)
+		}
+		data, err := json.Marshal(kvs)
+		if err != nil {
+			log.Fatalf("Error-03: fail to encode %v: %v\n", kvs, err)
+		}
+		_, err = tempFile.Write(data)
+		if err != nil {
+			log.Fatalf("Error-04: fail to write to temp file %v: %v\n", tempFile.Name(), err)
+		}
+		tempFile.Close()
+		os.Rename(tempFile.Name(), intermediateFileName)
+		intermediateFileNames = append(intermediateFileNames, intermediateFileName)
+	}
+
+	ok := CallWorkerDone(reply.workerIndex).ok
+	if !ok {
+		for _, interFileName := range intermediateFileNames {
+			err := os.Remove(interFileName)
+			if err != nil {
+				log.Fatalf("Error-05: cannot delete file %v: %v\n", interFileName, err)
+			}
+		}
+	}
+}
+
+func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
+	oname := "mr-out-" + strconv.Itoa(reply.workerIndex)
+	ofile, _ := os.Create(oname)
+
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		log.Fatalf("Error-06: cannot read dir %v\n", err)
+	}
+
+	var kva []KeyValue
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), strconv.Itoa(reply.workerIndex)) {
+			content, err := os.ReadFile(reply.fileName)
+			if err != nil {
+				log.Fatalf("Error-07: cannot read file %v: %v\n", reply.fileName, err)
+			}
+
+			temp := []KeyValue{}
+			err = json.Unmarshal(content, &temp)
+			if err != nil {
+				log.Fatalf("Error-08: fail to decode json %v : %v\n", content, err)
+			}
+			kva = append(kva, temp...)
+		}
+	}
+
+	sort.Sort(ByKey(kva))
+	//
+	// call Reduce on each distinct key in intermediate[],
+	// and print the result to mr-out-R.
+	//
+	i := 0
+	for i < len(kva) {
+		j := i + 1
+		for j < len(kva) && kva[j].Key == kva[i].Key {
+			j++
+		}
+		values := []string{}
+		for k := i; k < j; k++ {
+			values = append(values, kva[k].Value)
+		}
+		output := reducef(kva[i].Key, values)
+
+		// this is the correct format for each line of Reduce output.
+		fmt.Fprintf(ofile, "%v %v\n", kva[i].Key, output)
+
+		i = j
+	}
+
+	ok := CallWorkerDone(reply.workerIndex).ok
+	if !ok {
+		err := os.Remove(oname)
+		if err != nil {
+			log.Fatalf("Error-05: cannot delete file %v: %v\n", oname, err)
+		}
+	}
+}
+
 // example function to show how to make an RPC call to the coordinator.
 //
 // the RPC argument and reply types are defined in rpc.go.
-//
 func CallExample() {
 
 	// declare an argument structure.
@@ -67,11 +193,39 @@ func CallExample() {
 	}
 }
 
-//
+func CallGetTask() *TaskReply {
+	args := TaskArgs{}
+	reply := TaskReply{}
+	ok := call("Coordinator.GetTask", &args, &reply)
+	if ok {
+		log.Printf("Task type is %v\n", reply.category)
+		return &reply
+	} else {
+		log.Fatalf("call GetTask failed\n")
+		return nil
+	}
+}
+
+func CallWorkerDone(workerIndex int) *WorkerDoneReply {
+	args := WorkerDoneArgs{
+		workerIndex: workerIndex,
+	}
+	reply := WorkerDoneReply{
+		ok: false,
+	}
+	ok := call("Coordinator.WorkerDone", &args, &reply)
+	if ok {
+		log.Printf("worker %v call WorkerDone success!\n", workerIndex)
+		return &reply
+	} else {
+		log.Fatalf("call WorkerDone failed!\n")
+		return nil
+	}
+}
+
 // send an RPC request to the coordinator, wait for the response.
 // usually returns true.
 // returns false if something goes wrong.
-//
 func call(rpcname string, args interface{}, reply interface{}) bool {
 	// c, err := rpc.DialHTTP("tcp", "127.0.0.1"+":1234")
 	sockname := coordinatorSock()
