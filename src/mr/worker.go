@@ -46,9 +46,9 @@ func Worker(mapf func(string, string) []KeyValue,
 		reply := CallGetTask()
 		if reply == nil {
 			continue
-		} else if reply.category == "Mapping" {
+		} else if reply.Category == "Mapping" {
 			mapperWork(mapf, reply)
-		} else if reply.category == "Reducer" {
+		} else if reply.Category == "Reducer" {
 			reducerWork(reducef, reply)
 		} else {
 			time.Sleep(time.Second)
@@ -61,13 +61,13 @@ func Worker(mapf func(string, string) []KeyValue,
 
 func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 	// read file
-	content, err := os.ReadFile(reply.fileName)
+	content, err := os.ReadFile(reply.FileName)
 	if err != nil {
-		log.Fatalf("Error-01: read file %v: %v\n", reply.fileName, err)
+		log.Fatalf("Error-01: read file %v: %v\n", reply.FileName, err)
 	}
 
 	// do map
-	intermediate := mapf(reply.fileName, string(content))
+	intermediate := mapf(reply.FileName, string(content))
 
 	var intermediateFileNames []string
 	kvByReduce := map[int][]KeyValue{}
@@ -79,7 +79,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 
 	// write intermediate file
 	for k, kvs := range kvByReduce {
-		intermediateFileName := "mr-" + strconv.Itoa(reply.workerIndex) + "-" + strconv.Itoa(k)
+		intermediateFileName := "mr-" + strconv.Itoa(reply.WorkerIndex) + "-" + strconv.Itoa(k)
 		tempFile, err := ioutil.TempFile(".", intermediateFileName+"-"+"temp")
 		if err != nil {
 			log.Fatalf("Error-02: fail to create temp file %v: %v\n", intermediateFileName, err)
@@ -97,7 +97,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 		intermediateFileNames = append(intermediateFileNames, intermediateFileName)
 	}
 
-	ok := CallWorkerDone(reply.workerIndex).ok
+	ok := CallWorkerDone(reply.WorkerIndex).Ok
 	if !ok {
 		for _, interFileName := range intermediateFileNames {
 			err := os.Remove(interFileName)
@@ -109,7 +109,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 }
 
 func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
-	oname := "mr-out-" + strconv.Itoa(reply.workerIndex)
+	oname := "mr-out-" + strconv.Itoa(reply.WorkerIndex)
 	ofile, _ := os.Create(oname)
 
 	files, err := ioutil.ReadDir(".")
@@ -119,10 +119,10 @@ func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
 
 	var kva []KeyValue
 	for _, file := range files {
-		if strings.HasSuffix(file.Name(), strconv.Itoa(reply.workerIndex)) {
-			content, err := os.ReadFile(reply.fileName)
+		if strings.HasSuffix(file.Name(), strconv.Itoa(reply.WorkerIndex)) {
+			content, err := os.ReadFile(reply.FileName)
 			if err != nil {
-				log.Fatalf("Error-07: cannot read file %v: %v\n", reply.fileName, err)
+				log.Fatalf("Error-07: cannot read file %v: %v\n", reply.FileName, err)
 			}
 
 			temp := []KeyValue{}
@@ -157,7 +157,7 @@ func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
 		i = j
 	}
 
-	ok := CallWorkerDone(reply.workerIndex).ok
+	ok := CallWorkerDone(reply.WorkerIndex).Ok
 	if !ok {
 		err := os.Remove(oname)
 		if err != nil {
@@ -195,10 +195,15 @@ func CallExample() {
 
 func CallGetTask() *TaskReply {
 	args := TaskArgs{}
-	reply := TaskReply{}
+	reply := TaskReply{
+		Category:    "NoWork",
+		WorkerIndex: -1,
+		FileName:    "-1",
+	}
+
 	ok := call("Coordinator.GetTask", &args, &reply)
 	if ok {
-		log.Printf("Task type is %v\n", reply.category)
+		log.Printf("Task type is %v\n", reply.Category)
 		return &reply
 	} else {
 		log.Fatalf("call GetTask failed\n")
@@ -208,10 +213,10 @@ func CallGetTask() *TaskReply {
 
 func CallWorkerDone(workerIndex int) *WorkerDoneReply {
 	args := WorkerDoneArgs{
-		workerIndex: workerIndex,
+		WorkerIndex: workerIndex,
 	}
 	reply := WorkerDoneReply{
-		ok: false,
+		Ok: false,
 	}
 	ok := call("Coordinator.WorkerDone", &args, &reply)
 	if ok {

@@ -28,17 +28,17 @@ type TaskArgs struct {
 }
 
 type TaskReply struct {
-	category    string // Mapper/Reducer/NoWork
-	workerIndex int
-	fileName    string
+	Category    string // Mapper/Reducer/NoWork
+	WorkerIndex int
+	FileName    string
 }
 
 type WorkerDoneArgs struct {
-	workerIndex int
+	WorkerIndex int
 }
 
 type WorkerDoneReply struct {
-	ok bool
+	Ok bool
 }
 
 // Cook up a unique-ish UNIX-domain socket name

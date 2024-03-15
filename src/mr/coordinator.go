@@ -1,22 +1,22 @@
 package mr
 
-import (
-	"log"
-	"time"
-)
+import "log"
 import "net"
-import "os"
 import "net/rpc"
 import "net/http"
+import "os"
+import "sync"
+import "time"
 
 type Coordinator struct {
 	// Your definitions here.
 	fileNames     []string // the name of files to be calculated
 	reduceNum     int      // the number of reduce tasks to use
-	workerCounter int      // TODO: if appStatus turns to Reducing, workerCounter should be reassigned to 0
+	workerCounter int      // if appStatus turns to Reducing, workerCounter should be reassigned to 0
 	workersStatus []WorkerStatus
 	appStatus     string // the status of application, Mapping/Reducing
 
+	coordinatorGuard sync.Mutex
 }
 
 type WorkerStatus struct {
@@ -28,52 +28,64 @@ type WorkerStatus struct {
 // Your code here -- RPC handlers for the worker to call.
 
 func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
+	c.coordinatorGuard.Lock()
+	defer c.coordinatorGuard.Unlock()
+
 	if c.appStatus == "Mapping" {
 		if len(c.fileNames) > 0 { // still have file
-			reply.category = "Mapper"
-			reply.workerIndex = c.workerCounter
-			reply.fileName = c.fileNames[0] // assign the first file to this worker
+			reply.Category = "Mapper"
+			reply.WorkerIndex = c.workerCounter
+			reply.FileName = c.fileNames[0] // assign the first file to this worker
 			c.fileNames = c.fileNames[1:]   // delete the first file
 			c.workerCounter++
 			c.workersStatus = append(c.workersStatus, WorkerStatus{
-				index:     reply.workerIndex,
+				index:     reply.WorkerIndex,
 				timeStamp: time.Now().Unix(),
-				fileName:  reply.fileName,
+				fileName:  reply.FileName,
 			})
 		} else { // no file need to be calculated
-			reply.category = "NoWork"
+			reply.Category = "NoWork"
 		}
 	} else if c.appStatus == "Reducing" {
 		if c.workerCounter < c.reduceNum { // the number of workers doesn't exceed
-			reply.category = "Reducer"
-			reply.workerIndex = c.workerCounter
+			reply.Category = "Reducer"
+			reply.WorkerIndex = c.workerCounter
 			c.workerCounter++
 			c.workersStatus = append(c.workersStatus, WorkerStatus{
-				index:     reply.workerIndex,
+				index:     reply.WorkerIndex,
 				timeStamp: time.Now().Unix(),
 			})
 		} else { // the number of workers exceeds
-			reply.category = "NoWork"
+			reply.Category = "NoWork"
 		}
 	} else {
-		reply.category = "NoWork"
+		reply.Category = "NoWork"
 	}
 
 	return nil
 }
 
 func (c *Coordinator) WorkerDone(args *WorkerDoneArgs, reply *WorkerDoneReply) error {
+	c.coordinatorGuard.Lock()
+
 	for i, workerStatus := range c.workersStatus {
-		if workerStatus.index == args.workerIndex {
+		if workerStatus.index == args.WorkerIndex {
 			c.workersStatus = append(c.workersStatus[:i], c.workersStatus[i+1:]...)
-			reply.ok = true
+			reply.Ok = true
 			break // Expect that only one same index
 		}
 	}
 	if len(c.fileNames)+len(c.workersStatus) == 0 {
-		c.appStatus = "Reducing"
+		if c.appStatus == "Mapping" {
+			c.appStatus = "Reducing"
+			c.workerCounter = 0
+		} else if c.appStatus == "Reducing" {
+			c.appStatus = "End"
+			c.workerCounter = 0
+		}
 	}
 
+	c.coordinatorGuard.Unlock()
 	return nil
 }
 
@@ -105,6 +117,7 @@ func (c *Coordinator) Done() bool {
 	ret := false
 
 	// Your code here.
+	c.coordinatorGuard.Lock()
 	for i, wokerStatus := range c.workersStatus {
 		timeNow := time.Now().Unix()
 		if timeNow-wokerStatus.timeStamp > 10 {
@@ -117,6 +130,7 @@ func (c *Coordinator) Done() bool {
 	if c.appStatus == "End" {
 		ret = true
 	}
+	c.coordinatorGuard.Unlock()
 
 	return ret
 }
