@@ -31,6 +31,7 @@ type TaskReply struct {
 	Category    string // Mapper/Reducer/NoWork
 	WorkerIndex int
 	FileName    string
+	ReduceNum   int
 }
 
 type WorkerDoneArgs struct {

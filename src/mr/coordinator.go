@@ -35,7 +35,8 @@ func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
 			reply.Category = "Mapper"
 			reply.WorkerIndex = c.workerCounter
 			reply.FileName = c.fileNames[0] // assign the first file to this worker
-			c.fileNames = c.fileNames[1:]   // delete the first file
+			reply.ReduceNum = c.reduceNum
+			c.fileNames = c.fileNames[1:] // delete the first file
 			c.workerCounter++
 			c.workersStatus = append(c.workersStatus, WorkerStatus{
 				index:     reply.WorkerIndex,
@@ -143,6 +144,7 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	// Your code here.
 	c.fileNames = files[:]
 	c.reduceNum = nReduce
+	c.workerCounter = 0
 	c.appStatus = "Mapping"
 
 	c.server()

@@ -73,7 +73,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 	kvByReduce := map[int][]KeyValue{}
 	for _, kv := range intermediate {
 		key := kv.Key
-		reduceIndex := ihash(key)
+		reduceIndex := ihash(key) % reply.ReduceNum
 		kvByReduce[reduceIndex] = append(kvByReduce[reduceIndex], kv)
 	}
 
@@ -199,6 +199,7 @@ func CallGetTask() *TaskReply {
 		Category:    "NoWork",
 		WorkerIndex: -1,
 		FileName:    "-1",
+		ReduceNum:   -1,
 	}
 
 	ok := call("Coordinator.GetTask", &args, &reply)
