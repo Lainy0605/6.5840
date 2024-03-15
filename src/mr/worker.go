@@ -3,7 +3,6 @@ package mr
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strconv"
@@ -51,7 +50,7 @@ func Worker(mapf func(string, string) []KeyValue,
 		} else if reply.Category == "Reducer" {
 			reducerWork(reducef, reply)
 		} else {
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 3)
 		}
 	}
 	// uncomment to send the Example RPC to the coordinator.
@@ -80,7 +79,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 	// write intermediate file
 	for k, kvs := range kvByReduce {
 		intermediateFileName := "mr-" + strconv.Itoa(reply.WorkerIndex) + "-" + strconv.Itoa(k)
-		tempFile, err := ioutil.TempFile(".", intermediateFileName+"-"+"temp")
+		tempFile, err := os.CreateTemp(".", intermediateFileName+"Temp")
 		if err != nil {
 			log.Fatalf("Error-02: fail to create temp file %v: %v\n", intermediateFileName, err)
 		}
@@ -93,7 +92,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 			log.Fatalf("Error-04: fail to write to temp file %v: %v\n", tempFile.Name(), err)
 		}
 		tempFile.Close()
-		os.Rename(tempFile.Name(), intermediateFileName)
+		os.Rename(tempFile.Name(), "/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles/"+intermediateFileName)
 		intermediateFileNames = append(intermediateFileNames, intermediateFileName)
 	}
 
@@ -109,36 +108,35 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 }
 
 func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
-	oname := "mr-out-" + strconv.Itoa(reply.WorkerIndex)
-	ofile, _ := os.Create(oname)
+	outFileName := "mr-out-" + strconv.Itoa(reply.WorkerIndex)
 
-	files, err := ioutil.ReadDir(".")
+	tempFile, err := os.CreateTemp(".", outFileName+"Temp")
 	if err != nil {
-		log.Fatalf("Error-06: cannot read dir %v\n", err)
+		log.Fatalf("Error-06: fail to create temp file %v: %v\n", outFileName, err)
+	}
+	files, err := os.ReadDir("/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles")
+	if err != nil {
+		log.Fatalf("Error-07: cannot read dir %v\n", err)
 	}
 
 	var kva []KeyValue
 	for _, file := range files {
-		if strings.HasSuffix(file.Name(), strconv.Itoa(reply.WorkerIndex)) {
-			content, err := os.ReadFile(reply.FileName)
+		if strings.HasSuffix(file.Name(), strconv.Itoa(reply.WorkerIndex)) { //TODO: should not include mr-out-*
+			content, err := os.ReadFile("/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles/" + file.Name())
 			if err != nil {
-				log.Fatalf("Error-07: cannot read file %v: %v\n", reply.FileName, err)
+				log.Fatalf("Error-08: cannot read file %v: %v\n", file.Name(), err)
 			}
 
 			temp := []KeyValue{}
 			err = json.Unmarshal(content, &temp)
 			if err != nil {
-				log.Fatalf("Error-08: fail to decode json %v : %v\n", content, err)
+				log.Fatalf("Error-09: fail to decode json %v : %v\n", content, err)
 			}
 			kva = append(kva, temp...)
 		}
 	}
 
 	sort.Sort(ByKey(kva))
-	//
-	// call Reduce on each distinct key in intermediate[],
-	// and print the result to mr-out-R.
-	//
 	i := 0
 	for i < len(kva) {
 		j := i + 1
@@ -152,16 +150,19 @@ func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
 		output := reducef(kva[i].Key, values)
 
 		// this is the correct format for each line of Reduce output.
-		fmt.Fprintf(ofile, "%v %v\n", kva[i].Key, output)
+		fmt.Fprintf(tempFile, "%v %v\n", kva[i].Key, output)
 
 		i = j
 	}
 
+	tempFile.Close()
+	os.Rename(tempFile.Name(), outFileName)
+
 	ok := CallWorkerDone(reply.WorkerIndex).Ok
 	if !ok {
-		err := os.Remove(oname)
+		err := os.Remove(outFileName)
 		if err != nil {
-			log.Fatalf("Error-05: cannot delete file %v: %v\n", oname, err)
+			log.Fatalf("Error-05: cannot delete file %v: %v\n", outFileName, err)
 		}
 	}
 }
@@ -195,12 +196,7 @@ func CallExample() {
 
 func CallGetTask() *TaskReply {
 	args := TaskArgs{}
-	reply := TaskReply{
-		Category:    "NoWork",
-		WorkerIndex: -1,
-		FileName:    "-1",
-		ReduceNum:   -1,
-	}
+	reply := TaskReply{}
 
 	ok := call("Coordinator.GetTask", &args, &reply)
 	if ok {

@@ -29,9 +29,9 @@ type TaskArgs struct {
 
 type TaskReply struct {
 	Category    string // Mapper/Reducer/NoWork
-	WorkerIndex int
-	FileName    string
-	ReduceNum   int
+	WorkerIndex int    // index of current worker
+	FileName    string // which file should calculate, only for Mapper to use
+	ReduceNum   int    // How many reducer in total, only for Mapper to use
 }
 
 type WorkerDoneArgs struct {

@@ -69,6 +69,8 @@ func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
 func (c *Coordinator) WorkerDone(args *WorkerDoneArgs, reply *WorkerDoneReply) error {
 	c.coordinatorGuard.Lock()
 
+	// TODO: Coordinator should delete intermediate files produced by Mapper if Mapper finishes too late( 10 seconds)
+	reply.Ok = false
 	for i, workerStatus := range c.workersStatus {
 		if workerStatus.index == args.WorkerIndex {
 			c.workersStatus = append(c.workersStatus[:i], c.workersStatus[i+1:]...)
@@ -80,10 +82,12 @@ func (c *Coordinator) WorkerDone(args *WorkerDoneArgs, reply *WorkerDoneReply) e
 		switch c.appStatus {
 		case "Mapping":
 			c.appStatus = "Reducing"
+			c.workerCounter = 0
 		case "Reducing":
-			c.appStatus = "End"
+			if c.workerCounter == c.reduceNum {
+				c.appStatus = "End"
+			}
 		}
-		c.workerCounter = 0
 	}
 
 	c.coordinatorGuard.Unlock()
