@@ -46,7 +46,7 @@ func Worker(mapf func(string, string) []KeyValue,
 		reply := CallGetTask()
 		if reply == nil {
 			continue
-		} else if reply.Category == "Mapping" {
+		} else if reply.Category == "Mapper" {
 			mapperWork(mapf, reply)
 		} else if reply.Category == "Reducer" {
 			reducerWork(reducef, reply)

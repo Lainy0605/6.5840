@@ -29,7 +29,6 @@ type WorkerStatus struct {
 
 func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
 	c.coordinatorGuard.Lock()
-	defer c.coordinatorGuard.Unlock()
 
 	if c.appStatus == "Mapping" {
 		if len(c.fileNames) > 0 { // still have file
@@ -62,6 +61,7 @@ func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
 		reply.Category = "NoWork"
 	}
 
+	c.coordinatorGuard.Unlock()
 	return nil
 }
 
@@ -76,13 +76,13 @@ func (c *Coordinator) WorkerDone(args *WorkerDoneArgs, reply *WorkerDoneReply) e
 		}
 	}
 	if len(c.fileNames)+len(c.workersStatus) == 0 {
-		if c.appStatus == "Mapping" {
+		switch c.appStatus {
+		case "Mapping":
 			c.appStatus = "Reducing"
-			c.workerCounter = 0
-		} else if c.appStatus == "Reducing" {
+		case "Reducing":
 			c.appStatus = "End"
-			c.workerCounter = 0
 		}
+		c.workerCounter = 0
 	}
 
 	c.coordinatorGuard.Unlock()
