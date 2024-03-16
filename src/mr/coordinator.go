@@ -10,8 +10,8 @@ import "time"
 
 type Coordinator struct {
 	// Your definitions here.
-	fileNames     []string // the name of files to be calculated
-	reduceNum     int      // the number of reduce tasks to use
+	fileNames     []string // the name of files to be mapped
+	reduceNum     []int    // the index of reducer remaining to be done
 	workerCounter int      // if appStatus turns to Reducing, workerCounter should be reassigned to 0
 	workersStatus []WorkerStatus
 	appStatus     string // the status of application, Mapping/Reducing
@@ -35,7 +35,7 @@ func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
 			reply.Category = "Mapper"
 			reply.WorkerIndex = c.workerCounter
 			reply.FileName = c.fileNames[0] // assign the first file to this worker
-			reply.ReduceNum = c.reduceNum
+			reply.ReduceNum = len(c.reduceNum)
 			c.fileNames = c.fileNames[1:] // delete the first file
 			c.workerCounter++
 			c.workersStatus = append(c.workersStatus, WorkerStatus{
@@ -47,10 +47,10 @@ func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
 			reply.Category = "NoWork"
 		}
 	} else if c.appStatus == "Reducing" {
-		if c.workerCounter < c.reduceNum { // the number of workers doesn't exceed
+		if len(c.reduceNum) > 0 { // the number of workers doesn't exceed
 			reply.Category = "Reducer"
-			reply.WorkerIndex = c.workerCounter
-			c.workerCounter++
+			reply.WorkerIndex = c.reduceNum[0]
+			c.reduceNum = c.reduceNum[1:]
 			c.workersStatus = append(c.workersStatus, WorkerStatus{
 				index:     reply.WorkerIndex,
 				timeStamp: time.Now().Unix(),
@@ -84,7 +84,7 @@ func (c *Coordinator) WorkerDone(args *WorkerDoneArgs, reply *WorkerDoneReply) e
 			c.appStatus = "Reducing"
 			c.workerCounter = 0
 		case "Reducing":
-			if c.workerCounter == c.reduceNum {
+			if len(c.reduceNum) == 0 {
 				c.appStatus = "End"
 			}
 		}
@@ -127,7 +127,11 @@ func (c *Coordinator) Done() bool {
 		timeNow := time.Now().Unix()
 		if timeNow-wokerStatus.timeStamp > 10 {
 			c.workersStatus = append(c.workersStatus[:i], c.workersStatus[i+1:]...)
-			c.fileNames = append(c.fileNames, wokerStatus.fileName)
+			if c.appStatus == "Mapping" {
+				c.fileNames = append(c.fileNames, wokerStatus.fileName)
+			} else if c.appStatus == "Reducing" {
+				c.reduceNum = append(c.reduceNum, wokerStatus.index)
+			}
 			break
 		}
 	}
@@ -147,9 +151,12 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	c := Coordinator{}
 	// Your code here.
 	c.fileNames = files[:]
-	c.reduceNum = nReduce
 	c.workerCounter = 0
 	c.appStatus = "Mapping"
+
+	for i := 0; i < nReduce; i++ {
+		c.reduceNum = append(c.reduceNum, i)
+	}
 
 	c.server()
 	return &c

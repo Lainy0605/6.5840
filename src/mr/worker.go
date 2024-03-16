@@ -97,6 +97,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 	}
 
 	ok := CallWorkerDone(reply.WorkerIndex).Ok
+	//TODO: not necessarily delete?
 	if !ok {
 		for _, interFileName := range intermediateFileNames {
 			err := os.Remove(interFileName)
@@ -159,6 +160,7 @@ func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
 	os.Rename(tempFile.Name(), outFileName)
 
 	ok := CallWorkerDone(reply.WorkerIndex).Ok
+	//TODO: not necessarily delete?
 	if !ok {
 		err := os.Remove(outFileName)
 		if err != nil {
