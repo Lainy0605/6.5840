@@ -46,7 +46,9 @@ func Worker(mapf func(string, string) []KeyValue,
 		switch task.TaskType {
 		case MapTask:
 			mapperWork(mapf, task)
+			CallTaskDone(task.TaskId)
 		case ReduceTask:
+			CallTaskDone(task.TaskId)
 			reducerWork(reducef, task)
 		case WaittingTask:
 			log.Printf("No task to do")
@@ -71,7 +73,6 @@ func mapperWork(mapf func(string, string) []KeyValue, task Task) {
 	// do map
 	intermediate := mapf(task.FileName, string(content))
 
-	var intermediateFileNames []string
 	kvByReduce := map[int][]KeyValue{}
 	for _, kv := range intermediate {
 		key := kv.Key
@@ -96,18 +97,6 @@ func mapperWork(mapf func(string, string) []KeyValue, task Task) {
 		}
 		tempFile.Close()
 		os.Rename(tempFile.Name(), "/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles/"+intermediateFileName)
-		intermediateFileNames = append(intermediateFileNames, intermediateFileName)
-	}
-
-	ok := CallTaskDone(task.TaskId).Ok
-	//TODO: not necessarily delete?
-	if !ok {
-		for _, interFileName := range intermediateFileNames {
-			err := os.Remove(interFileName)
-			if err != nil {
-				log.Fatalf("Error-05: cannot delete file %v: %v\n", interFileName, err)
-			}
-		}
 	}
 }
 
@@ -161,15 +150,6 @@ func reducerWork(reducef func(string, []string) string, task Task) {
 
 	tempFile.Close()
 	os.Rename(tempFile.Name(), outFileName)
-
-	ok := CallTaskDone(task.TaskId).Ok
-	//TODO: not necessarily delete?
-	if !ok {
-		err := os.Remove(outFileName)
-		if err != nil {
-			log.Fatalf("Error-05: cannot delete file %v: %v\n", outFileName, err)
-		}
-	}
 }
 
 // example function to show how to make an RPC call to the coordinator.
@@ -212,7 +192,7 @@ func CallGetTask() Task {
 	return task
 }
 
-func CallTaskDone(taskId int) TaskDoneReply {
+func CallTaskDone(taskId int) {
 	args := TaskDoneArgs{
 		TaskId: taskId,
 	}
@@ -223,7 +203,6 @@ func CallTaskDone(taskId int) TaskDoneReply {
 	} else {
 		log.Fatalf("call TaskDone failed!\n")
 	}
-	return reply
 }
 
 // send an RPC request to the coordinator, wait for the response.

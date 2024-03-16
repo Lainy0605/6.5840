@@ -201,6 +201,7 @@ wait
 echo '***' Starting job count test.
 
 rm -f mr-*
+rm -f ../intermediateFiles/mr-*
 
 maybe_quiet $TIMEOUT ../mrcoordinator ../pg*txt  &
 sleep 1
@@ -279,6 +280,7 @@ else
   failed_any=1
 fi
 rm -f mr-*
+rm -f ../intermediateFiles/mr-*
 
 #########################################################
 echo '***' Starting crash test.

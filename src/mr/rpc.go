@@ -24,7 +24,7 @@ type ExampleReply struct {
 
 // Add your RPC definitions here.
 type TaskArgs struct {
-	X int
+	X int // no use
 }
 
 type Task struct {
@@ -48,7 +48,7 @@ type TaskDoneArgs struct {
 }
 
 type TaskDoneReply struct {
-	Ok bool
+	X int //no use
 }
 
 // Cook up a unique-ish UNIX-domain socket name

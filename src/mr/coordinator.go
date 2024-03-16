@@ -78,12 +78,10 @@ func (c *Coordinator) AssignTask(args *TaskArgs, task *Task) error {
 func (c *Coordinator) TaskDone(args *TaskDoneArgs, reply *TaskDoneReply) error {
 	c.coordinatorGuard.Lock()
 	defer c.coordinatorGuard.Unlock()
-	// TODO: Coordinator should delete intermediate files produced by Mapper if Mapper finishes too late( 10 seconds)
-	reply.Ok = false
+
 	for i, taskStatus := range c.TasksStatus {
 		if taskStatus.taskId == args.TaskId {
 			c.TasksStatus = append(c.TasksStatus[:i], c.TasksStatus[i+1:]...)
-			reply.Ok = true
 			break // Expect that only one same taskId
 		}
 	}
