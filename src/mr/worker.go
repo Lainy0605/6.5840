@@ -42,15 +42,18 @@ func Worker(mapf func(string, string) []KeyValue,
 	// Your worker implementation here.
 	live := true
 	for live {
-		reply := CallGetTask()
-		if reply == nil {
-			continue
-		} else if reply.Category == "Mapper" {
-			mapperWork(mapf, reply)
-		} else if reply.Category == "Reducer" {
-			reducerWork(reducef, reply)
-		} else {
-			time.Sleep(time.Second * 3)
+		task := CallGetTask()
+		switch task.TaskType {
+		case MapTask:
+			mapperWork(mapf, task)
+		case ReduceTask:
+			reducerWork(reducef, task)
+		case WaittingTask:
+			log.Printf("No task to do")
+			time.Sleep(time.Second)
+		case ExitTask:
+			log.Printf("Task exit") //TODO
+			live = false
 		}
 	}
 	// uncomment to send the Example RPC to the coordinator.
@@ -58,27 +61,27 @@ func Worker(mapf func(string, string) []KeyValue,
 
 }
 
-func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
+func mapperWork(mapf func(string, string) []KeyValue, task Task) {
 	// read file
-	content, err := os.ReadFile(reply.FileName)
+	content, err := os.ReadFile(task.FileName)
 	if err != nil {
-		log.Fatalf("Error-01: read file %v: %v\n", reply.FileName, err)
+		log.Fatalf("Error-01: read file %v: %v\n", task.FileName, err)
 	}
 
 	// do map
-	intermediate := mapf(reply.FileName, string(content))
+	intermediate := mapf(task.FileName, string(content))
 
 	var intermediateFileNames []string
 	kvByReduce := map[int][]KeyValue{}
 	for _, kv := range intermediate {
 		key := kv.Key
-		reduceIndex := ihash(key) % reply.ReduceNum
+		reduceIndex := ihash(key) % task.ReduceNum
 		kvByReduce[reduceIndex] = append(kvByReduce[reduceIndex], kv)
 	}
 
 	// write intermediate file
 	for k, kvs := range kvByReduce {
-		intermediateFileName := "mr-" + strconv.Itoa(reply.WorkerIndex) + "-" + strconv.Itoa(k)
+		intermediateFileName := "mr-" + strconv.Itoa(task.TaskId) + "-" + strconv.Itoa(k)
 		tempFile, err := os.CreateTemp(".", intermediateFileName+"Temp")
 		if err != nil {
 			log.Fatalf("Error-02: fail to create temp file %v: %v\n", intermediateFileName, err)
@@ -96,7 +99,7 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 		intermediateFileNames = append(intermediateFileNames, intermediateFileName)
 	}
 
-	ok := CallWorkerDone(reply.WorkerIndex).Ok
+	ok := CallTaskDone(task.TaskId).Ok
 	//TODO: not necessarily delete?
 	if !ok {
 		for _, interFileName := range intermediateFileNames {
@@ -108,8 +111,8 @@ func mapperWork(mapf func(string, string) []KeyValue, reply *TaskReply) {
 	}
 }
 
-func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
-	outFileName := "mr-out-" + strconv.Itoa(reply.WorkerIndex)
+func reducerWork(reducef func(string, []string) string, task Task) {
+	outFileName := "mr-out-" + strconv.Itoa(task.TaskId)
 
 	tempFile, err := os.CreateTemp(".", outFileName+"Temp")
 	if err != nil {
@@ -122,7 +125,7 @@ func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
 
 	var kva []KeyValue
 	for _, file := range files {
-		if strings.HasSuffix(file.Name(), strconv.Itoa(reply.WorkerIndex)) { //TODO: should not include mr-out-*
+		if strings.HasSuffix(file.Name(), strconv.Itoa(task.TaskId)) { //TODO: should not include mr-out-*
 			content, err := os.ReadFile("/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles/" + file.Name())
 			if err != nil {
 				log.Fatalf("Error-08: cannot read file %v: %v\n", file.Name(), err)
@@ -159,7 +162,7 @@ func reducerWork(reducef func(string, []string) string, reply *TaskReply) {
 	tempFile.Close()
 	os.Rename(tempFile.Name(), outFileName)
 
-	ok := CallWorkerDone(reply.WorkerIndex).Ok
+	ok := CallTaskDone(task.TaskId).Ok
 	//TODO: not necessarily delete?
 	if !ok {
 		err := os.Remove(outFileName)
@@ -196,35 +199,31 @@ func CallExample() {
 	}
 }
 
-func CallGetTask() *TaskReply {
+func CallGetTask() Task {
 	args := TaskArgs{}
-	reply := TaskReply{}
+	task := Task{}
 
-	ok := call("Coordinator.GetTask", &args, &reply)
+	ok := call("Coordinator.AssignTask", &args, &task)
 	if ok {
-		log.Printf("Task type is %v\n", reply.Category)
-		return &reply
+		log.Printf("Task type is %v\n", task.TaskType)
 	} else {
-		log.Fatalf("call GetTask failed\n")
-		return nil
+		log.Fatalf("call AssignTask failed\n")
 	}
+	return task
 }
 
-func CallWorkerDone(workerIndex int) *WorkerDoneReply {
-	args := WorkerDoneArgs{
-		WorkerIndex: workerIndex,
+func CallTaskDone(taskId int) TaskDoneReply {
+	args := TaskDoneArgs{
+		TaskId: taskId,
 	}
-	reply := WorkerDoneReply{
-		Ok: false,
-	}
-	ok := call("Coordinator.WorkerDone", &args, &reply)
+	reply := TaskDoneReply{}
+	ok := call("Coordinator.TaskDone", &args, &reply)
 	if ok {
-		log.Printf("worker %v call WorkerDone success!\n", workerIndex)
-		return &reply
+		log.Printf("worker %v call TaskDone success!\n", taskId)
 	} else {
-		log.Fatalf("call WorkerDone failed!\n")
-		return nil
+		log.Fatalf("call TaskDone failed!\n")
 	}
+	return reply
 }
 
 // send an RPC request to the coordinator, wait for the response.

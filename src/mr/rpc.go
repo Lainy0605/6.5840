@@ -27,18 +27,27 @@ type TaskArgs struct {
 	X int
 }
 
-type TaskReply struct {
-	Category    string // Mapper/Reducer/NoWork
-	WorkerIndex int    // index of current worker
-	FileName    string // which file should calculate, only for Mapper to use
-	ReduceNum   int    // How many reducer in total, only for Mapper to use
+type Task struct {
+	TaskType  TaskType // Mapper/Reducer/NoWork
+	TaskId    int      // taskId of current worker
+	FileName  string   // which file should calculate, only for Mapper to use
+	ReduceNum int      // How many reducer in total, only for Mapper to use
 }
 
-type WorkerDoneArgs struct {
-	WorkerIndex int
+type TaskType int
+
+const (
+	MapTask TaskType = iota
+	ReduceTask
+	WaittingTask
+	ExitTask
+)
+
+type TaskDoneArgs struct {
+	TaskId int
 }
 
-type WorkerDoneReply struct {
+type TaskDoneReply struct {
 	Ok bool
 }
 

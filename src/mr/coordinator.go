@@ -10,87 +10,96 @@ import "time"
 
 type Coordinator struct {
 	// Your definitions here.
-	fileNames     []string // the name of files to be mapped
-	reduceNum     []int    // the index of reducer remaining to be done
-	workerCounter int      // if appStatus turns to Reducing, workerCounter should be reassigned to 0
-	workersStatus []WorkerStatus
-	appStatus     string // the status of application, Mapping/Reducing
+	files         []string // the name of files to be mapped
+	reduceNum     []int    // the taskId of reducer remaining to be done
+	TaskIdCounter int      // if AppPhase turns to Reducing, TaskIdCounter should be reassigned to 0
+	AppPhase      AppPhase // the Phase of application, Mapping/Reducing
+	TasksStatus   []TaskStatus
 
 	coordinatorGuard sync.Mutex
 }
 
-type WorkerStatus struct {
-	index     int
+type TaskStatus struct {
+	taskId    int
 	timeStamp int64
 	fileName  string
 }
 
+type AppPhase int
+
+const (
+	MapPhase AppPhase = iota
+	ReducePhase
+	End
+)
+
 // Your code here -- RPC handlers for the worker to call.
 
-func (c *Coordinator) GetTask(args *TaskArgs, reply *TaskReply) error {
+func (c *Coordinator) AssignTask(args *TaskArgs, task *Task) error {
 	c.coordinatorGuard.Lock()
+	defer c.coordinatorGuard.Unlock()
 
-	if c.appStatus == "Mapping" {
-		if len(c.fileNames) > 0 { // still have file
-			reply.Category = "Mapper"
-			reply.WorkerIndex = c.workerCounter
-			reply.FileName = c.fileNames[0] // assign the first file to this worker
-			reply.ReduceNum = len(c.reduceNum)
-			c.fileNames = c.fileNames[1:] // delete the first file
-			c.workerCounter++
-			c.workersStatus = append(c.workersStatus, WorkerStatus{
-				index:     reply.WorkerIndex,
+	switch c.AppPhase {
+	case MapPhase:
+		if len(c.files) > 0 { // still have file
+			task.TaskType = MapTask
+			task.TaskId = c.TaskIdCounter
+			task.FileName = c.files[0] // assign the first file to this worker
+			task.ReduceNum = len(c.reduceNum)
+			c.files = c.files[1:] // delete the first file
+			c.TaskIdCounter++
+			c.TasksStatus = append(c.TasksStatus, TaskStatus{
+				taskId:    task.TaskId,
 				timeStamp: time.Now().Unix(),
-				fileName:  reply.FileName,
+				fileName:  task.FileName,
 			})
 		} else { // no file need to be calculated
-			reply.Category = "NoWork"
+			task.TaskType = WaittingTask
 		}
-	} else if c.appStatus == "Reducing" {
+	case ReducePhase:
 		if len(c.reduceNum) > 0 { // the number of workers doesn't exceed
-			reply.Category = "Reducer"
-			reply.WorkerIndex = c.reduceNum[0]
+			task.TaskType = ReduceTask
+			task.TaskId = c.reduceNum[0]
 			c.reduceNum = c.reduceNum[1:]
-			c.workersStatus = append(c.workersStatus, WorkerStatus{
-				index:     reply.WorkerIndex,
+			c.TasksStatus = append(c.TasksStatus, TaskStatus{
+				taskId:    task.TaskId,
 				timeStamp: time.Now().Unix(),
 			})
 		} else { // the number of workers exceeds
-			reply.Category = "NoWork"
+			task.TaskType = WaittingTask
 		}
-	} else {
-		reply.Category = "NoWork"
+	case End:
+		task.TaskType = ExitTask
 	}
 
-	c.coordinatorGuard.Unlock()
 	return nil
 }
 
-func (c *Coordinator) WorkerDone(args *WorkerDoneArgs, reply *WorkerDoneReply) error {
+func (c *Coordinator) TaskDone(args *TaskDoneArgs, reply *TaskDoneReply) error {
 	c.coordinatorGuard.Lock()
-
+	defer c.coordinatorGuard.Unlock()
 	// TODO: Coordinator should delete intermediate files produced by Mapper if Mapper finishes too late( 10 seconds)
 	reply.Ok = false
-	for i, workerStatus := range c.workersStatus {
-		if workerStatus.index == args.WorkerIndex {
-			c.workersStatus = append(c.workersStatus[:i], c.workersStatus[i+1:]...)
+	for i, taskStatus := range c.TasksStatus {
+		if taskStatus.taskId == args.TaskId {
+			c.TasksStatus = append(c.TasksStatus[:i], c.TasksStatus[i+1:]...)
 			reply.Ok = true
-			break // Expect that only one same index
-		}
-	}
-	if len(c.fileNames)+len(c.workersStatus) == 0 {
-		switch c.appStatus {
-		case "Mapping":
-			c.appStatus = "Reducing"
-			c.workerCounter = 0
-		case "Reducing":
-			if len(c.reduceNum) == 0 {
-				c.appStatus = "End"
-			}
+			break // Expect that only one same taskId
 		}
 	}
 
-	c.coordinatorGuard.Unlock()
+	switch c.AppPhase {
+	case MapPhase:
+		if len(c.files)+len(c.TasksStatus) == 0 {
+			c.AppPhase = ReducePhase
+			c.TaskIdCounter = 0
+		}
+	case ReducePhase:
+		if len(c.TasksStatus)+len(c.reduceNum) == 0 {
+			c.AppPhase = End
+		}
+	}
+
 	return nil
 }
 
@@ -123,23 +132,23 @@ func (c *Coordinator) Done() bool {
 
 	// Your code here.
 	c.coordinatorGuard.Lock()
-	for i, wokerStatus := range c.workersStatus {
+	defer c.coordinatorGuard.Unlock()
+	for i, wokerStatus := range c.TasksStatus {
 		timeNow := time.Now().Unix()
 		if timeNow-wokerStatus.timeStamp > 10 {
-			c.workersStatus = append(c.workersStatus[:i], c.workersStatus[i+1:]...)
-			if c.appStatus == "Mapping" {
-				c.fileNames = append(c.fileNames, wokerStatus.fileName)
-			} else if c.appStatus == "Reducing" {
-				c.reduceNum = append(c.reduceNum, wokerStatus.index)
+			c.TasksStatus = append(c.TasksStatus[:i], c.TasksStatus[i+1:]...)
+			if c.AppPhase == MapPhase {
+				c.files = append(c.files, wokerStatus.fileName)
+			} else if c.AppPhase == ReducePhase {
+				c.reduceNum = append(c.reduceNum, wokerStatus.taskId)
 			}
 			break
 		}
 	}
 
-	if c.appStatus == "End" {
+	if c.AppPhase == End {
 		ret = true
 	}
-	c.coordinatorGuard.Unlock()
 
 	return ret
 }
@@ -150,9 +159,9 @@ func (c *Coordinator) Done() bool {
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	c := Coordinator{}
 	// Your code here.
-	c.fileNames = files[:]
-	c.workerCounter = 0
-	c.appStatus = "Mapping"
+	c.files = files[:]
+	c.TaskIdCounter = 0
+	c.AppPhase = MapPhase
 
 	for i := 0; i < nReduce; i++ {
 		c.reduceNum = append(c.reduceNum, i)
