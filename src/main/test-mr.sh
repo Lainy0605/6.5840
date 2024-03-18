@@ -56,6 +56,7 @@ rm -rf mr-tmp
 mkdir mr-tmp || exit 1
 cd mr-tmp || exit 1
 rm -f mr-*
+rm -f ../intermediateFiles/mr-*
 
 # make sure software is freshly built.
 (cd ../../mrapps && go clean)
@@ -76,6 +77,7 @@ failed_any=0
 
 #########################################################
 # first word-count
+rm -f mr-out*
 
 # generate the correct output
 ../mrsequential ../../mrapps/wc.so ../pg*txt || exit 1
@@ -116,6 +118,7 @@ wait
 #########################################################
 # now indexer
 rm -f mr-*
+rm -f ../intermediateFiles/mr-*
 
 # generate the correct output
 ../mrsequential ../../mrapps/indexer.so ../pg*txt || exit 1
@@ -147,6 +150,7 @@ wait
 echo '***' Starting map parallelism test.
 
 rm -f mr-*
+rm -f ../intermediateFiles/mr-*
 
 maybe_quiet $TIMEOUT ../mrcoordinator ../pg*txt &
 sleep 1
@@ -178,6 +182,7 @@ wait
 echo '***' Starting reduce parallelism test.
 
 rm -f mr-*
+rm -f ../intermediateFiles/mr-*
 
 maybe_quiet $TIMEOUT ../mrcoordinator ../pg*txt &
 sleep 1
@@ -227,6 +232,7 @@ wait
 # test whether any worker or coordinator exits before the
 # task has completed (i.e., all output files have been finalized)
 rm -f mr-*
+rm -f ../intermediateFiles/mr-*
 
 echo '***' Starting early exit test.
 
