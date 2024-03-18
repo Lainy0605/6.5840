@@ -50,13 +50,14 @@ func Worker(mapf func(string, string) []KeyValue,
 			mapperWork(mapf, task)
 			CallTaskDone(task.TaskId)
 		case ReduceTask:
-			CallTaskDone(task.TaskId)
 			reducerWork(reducef, task)
+			CallTaskDone(task.TaskId)
 		case WaitingTask:
 			log.Printf("No task to do")
 			time.Sleep(time.Second)
 		case ExitTask:
-			log.Printf("Task exit") //TODO
+			log.Printf("Task exit")
+			live = false
 		}
 	}
 	// uncomment to send the Example RPC to the coordinator.
