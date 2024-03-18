@@ -10,19 +10,20 @@ import "time"
 
 type Coordinator struct {
 	// Your definitions here.
-	files         []string // the name of files to be mapped
-	reduceNum     []int    // the taskId of reducer remaining to be done
-	TaskIdCounter int      // if AppPhase turns to Reducing, TaskIdCounter should be reassigned to 0
-	AppPhase      AppPhase // the Phase of application, Mapping/Reducing
-	TasksStatus   []TaskStatus
+	files             []string // the name of files to be mapped
+	reduceNum         int
+	taskIdCounter     int      // if appPhase turns to Reducing, taskIdCounter should be reassigned to 0
+	appPhase          AppPhase // the Phase of application, Mapping/Reducing
+	tasksStatus       map[int]TaskStatus
+	mapTaskChannel    chan *Task
+	reduceTaskChannel chan *Task
 
 	coordinatorGuard sync.Mutex
 }
 
 type TaskStatus struct {
-	taskId    int
 	timeStamp int64
-	fileName  string
+	task      *Task
 }
 
 type AppPhase int
@@ -39,34 +40,26 @@ func (c *Coordinator) AssignTask(args *TaskArgs, task *Task) error {
 	c.coordinatorGuard.Lock()
 	defer c.coordinatorGuard.Unlock()
 
-	switch c.AppPhase {
+	switch c.appPhase {
 	case MapPhase:
-		if len(c.files) > 0 { // still have file
-			task.TaskType = MapTask
-			task.TaskId = c.TaskIdCounter
-			task.FileName = c.files[0] // assign the first file to this worker
-			task.ReduceNum = len(c.reduceNum)
-			c.files = c.files[1:] // delete the first file
-			c.TaskIdCounter++
-			c.TasksStatus = append(c.TasksStatus, TaskStatus{
-				taskId:    task.TaskId,
+		if len(c.mapTaskChannel) > 0 {
+			*task = *<-c.mapTaskChannel
+			c.tasksStatus[task.TaskId] = TaskStatus{
 				timeStamp: time.Now().Unix(),
-				fileName:  task.FileName,
-			})
-		} else { // no file need to be calculated
-			task.TaskType = WaittingTask
+				task:      task,
+			}
+		} else {
+			task.TaskType = WaitingTask
 		}
 	case ReducePhase:
-		if len(c.reduceNum) > 0 { // the number of workers doesn't exceed
-			task.TaskType = ReduceTask
-			task.TaskId = c.reduceNum[0]
-			c.reduceNum = c.reduceNum[1:]
-			c.TasksStatus = append(c.TasksStatus, TaskStatus{
-				taskId:    task.TaskId,
+		if len(c.reduceTaskChannel) > 0 {
+			*task = *<-c.reduceTaskChannel
+			c.tasksStatus[task.TaskId] = TaskStatus{
 				timeStamp: time.Now().Unix(),
-			})
-		} else { // the number of workers exceeds
-			task.TaskType = WaittingTask
+				task:      task,
+			}
+		} else {
+			task.TaskType = WaitingTask
 		}
 	case End:
 		task.TaskType = ExitTask
@@ -79,26 +72,56 @@ func (c *Coordinator) TaskDone(args *TaskDoneArgs, reply *TaskDoneReply) error {
 	c.coordinatorGuard.Lock()
 	defer c.coordinatorGuard.Unlock()
 
-	for i, taskStatus := range c.TasksStatus {
-		if taskStatus.taskId == args.TaskId {
-			c.TasksStatus = append(c.TasksStatus[:i], c.TasksStatus[i+1:]...)
-			break // Expect that only one same taskId
+	for taskId, _ := range c.tasksStatus {
+		if taskId == args.TaskId {
+			delete(c.tasksStatus, taskId)
+			break
 		}
 	}
 
-	switch c.AppPhase {
+	switch c.appPhase {
 	case MapPhase:
-		if len(c.files)+len(c.TasksStatus) == 0 {
-			c.AppPhase = ReducePhase
-			c.TaskIdCounter = 0
+		if len(c.mapTaskChannel)+len(c.tasksStatus) == 0 {
+			c.appPhase = ReducePhase
 		}
 	case ReducePhase:
-		if len(c.TasksStatus)+len(c.reduceNum) == 0 {
-			c.AppPhase = End
+		if len(c.reduceTaskChannel)+len(c.tasksStatus) == 0 {
+			c.appPhase = End
 		}
 	}
 
 	return nil
+}
+
+func (c *Coordinator) makeMapTasks() {
+	for _, file := range c.files {
+		task := Task{
+			TaskType:  MapTask,
+			TaskId:    c.generateId(),
+			FileName:  file,
+			ReduceNum: c.reduceNum,
+		}
+
+		c.mapTaskChannel <- &task
+	}
+}
+
+func (c *Coordinator) makeReduceTasks() {
+	for i := 0; i < c.reduceNum; i++ {
+		task := Task{
+			TaskType: ReduceTask,
+			TaskId:   c.generateId(),
+			ReduceId: i,
+		}
+
+		c.reduceTaskChannel <- &task
+	}
+}
+
+func (c *Coordinator) generateId() int {
+	res := c.taskIdCounter
+	c.taskIdCounter++
+	return res
 }
 
 // an example RPC handler.
@@ -131,20 +154,20 @@ func (c *Coordinator) Done() bool {
 	// Your code here.
 	c.coordinatorGuard.Lock()
 	defer c.coordinatorGuard.Unlock()
-	for i, wokerStatus := range c.TasksStatus {
+	for taskId, taskStatus := range c.tasksStatus {
 		timeNow := time.Now().Unix()
-		if timeNow-wokerStatus.timeStamp > 10 {
-			c.TasksStatus = append(c.TasksStatus[:i], c.TasksStatus[i+1:]...)
-			if c.AppPhase == MapPhase {
-				c.files = append(c.files, wokerStatus.fileName)
-			} else if c.AppPhase == ReducePhase {
-				c.reduceNum = append(c.reduceNum, wokerStatus.taskId)
+		if timeNow-taskStatus.timeStamp > 10 {
+			delete(c.tasksStatus, taskId)
+			if c.appPhase == MapPhase {
+				c.mapTaskChannel <- taskStatus.task
+			} else if c.appPhase == ReducePhase {
+				c.reduceTaskChannel <- taskStatus.task
 			}
 			break
 		}
 	}
 
-	if c.AppPhase == End {
+	if c.appPhase == End {
 		ret = true
 	}
 
@@ -155,15 +178,18 @@ func (c *Coordinator) Done() bool {
 // main/mrcoordinator.go calls this function.
 // nReduce is the number of reduce tasks to use.
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
-	c := Coordinator{}
-	// Your code here.
-	c.files = files[:]
-	c.TaskIdCounter = 0
-	c.AppPhase = MapPhase
-
-	for i := 0; i < nReduce; i++ {
-		c.reduceNum = append(c.reduceNum, i)
+	c := Coordinator{
+		files:             files,
+		reduceNum:         nReduce,
+		taskIdCounter:     0,
+		appPhase:          MapPhase,
+		tasksStatus:       make(map[int]TaskStatus),
+		mapTaskChannel:    make(chan *Task, len(files)),
+		reduceTaskChannel: make(chan *Task, nReduce),
 	}
+
+	c.makeMapTasks()
+	c.makeReduceTasks()
 
 	c.server()
 	return &c

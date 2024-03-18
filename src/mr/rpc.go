@@ -29,9 +29,10 @@ type TaskArgs struct {
 
 type Task struct {
 	TaskType  TaskType // Mapper/Reducer/NoWork
-	TaskId    int      // taskId of current worker
+	TaskId    int      // task id
 	FileName  string   // which file should calculate, only for Mapper to use
 	ReduceNum int      // How many reducer in total, only for Mapper to use
+	ReduceId  int      // which reduce work to do, only for Reducer to use
 }
 
 type TaskType int
@@ -39,7 +40,7 @@ type TaskType int
 const (
 	MapTask TaskType = iota
 	ReduceTask
-	WaittingTask
+	WaitingTask
 	ExitTask
 )
 

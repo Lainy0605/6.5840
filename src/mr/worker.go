@@ -35,6 +35,8 @@ func ihash(key string) int {
 	return int(h.Sum32() & 0x7fffffff)
 }
 
+const INTERMEDIATEFILESPATH = "/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles/"
+
 // main/mrworker.go calls this function.
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
@@ -50,12 +52,11 @@ func Worker(mapf func(string, string) []KeyValue,
 		case ReduceTask:
 			CallTaskDone(task.TaskId)
 			reducerWork(reducef, task)
-		case WaittingTask:
+		case WaitingTask:
 			log.Printf("No task to do")
 			time.Sleep(time.Second)
 		case ExitTask:
 			log.Printf("Task exit") //TODO
-			live = false
 		}
 	}
 	// uncomment to send the Example RPC to the coordinator.
@@ -96,12 +97,12 @@ func mapperWork(mapf func(string, string) []KeyValue, task Task) {
 			log.Fatalf("Error-04: fail to write to temp file %v: %v\n", tempFile.Name(), err)
 		}
 		tempFile.Close()
-		os.Rename(tempFile.Name(), "/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles/"+intermediateFileName)
+		os.Rename(tempFile.Name(), INTERMEDIATEFILESPATH+intermediateFileName)
 	}
 }
 
 func reducerWork(reducef func(string, []string) string, task Task) {
-	outFileName := "mr-out-" + strconv.Itoa(task.TaskId)
+	outFileName := "mr-out-" + strconv.Itoa(task.ReduceId)
 
 	tempFile, err := os.CreateTemp(".", outFileName+"Temp")
 	if err != nil {
@@ -114,8 +115,8 @@ func reducerWork(reducef func(string, []string) string, task Task) {
 
 	var kva []KeyValue
 	for _, file := range files {
-		if strings.HasSuffix(file.Name(), strconv.Itoa(task.TaskId)) { //TODO: should not include mr-out-*
-			content, err := os.ReadFile("/Users/effy/Documents/GradeFour/6.5840/src/main/intermediateFiles/" + file.Name())
+		if strings.HasSuffix(file.Name(), strconv.Itoa(task.ReduceId)) { //TODO: should not include mr-out-*
+			content, err := os.ReadFile(INTERMEDIATEFILESPATH + file.Name())
 			if err != nil {
 				log.Fatalf("Error-08: cannot read file %v: %v\n", file.Name(), err)
 			}
