@@ -307,42 +307,6 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		}
 	}
 
-	//if args.Entries == nil && args.Term >= rf.currentTerm { //AppendEntries RPC that carry no log entries is heartbeat
-	//	rf.state = FOLLOWER
-	//	rf.currentTerm = args.Term
-	//	rf.electionTimer.Reset(rf.randomElectionTimeout())
-	//} else {
-	//	if args.Term < rf.currentTerm {
-	//		reply.Term = rf.currentTerm
-	//		reply.Success = false
-	//		return
-	//	} else if args.PrevLogIndex > rf.getLastLogIndex() || rf.log[args.PrevLogIndex].Term != args.PrevLogTerm { //Reply false if log doesn't contain an entry at prevLogIndex,whose term matches prevLogTerm (§5.3)
-	//		reply.Success = false
-	//		return
-	//	}
-	//
-	//	if args.Term > rf.currentTerm {
-	//		rf.currentTerm = args.Term
-	//		rf.state = FOLLOWER
-	//		rf.votedFor = -1
-	//	}
-	//
-	//	rf.log = rf.log[:args.PrevLogIndex]
-	//	for _, entry := range args.Entries {
-	//		rf.log = append(rf.log, entry)
-	//	}
-	//	reply.Success = true
-	//
-	//	//TODO: what is index of last new entry?
-	//	if args.LeaderCommit > rf.commitIndex {
-	//		if args.LeaderCommit < rf.getLastLogIndex() {
-	//			rf.commitIndex = args.LeaderCommit
-	//		} else {
-	//			rf.commitIndex = rf.getLastLogIndex()
-	//		}
-	//	}
-	//}
-
 	return
 }
 
@@ -414,12 +378,13 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 
 func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *AppendEntriesReply) bool {
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
-	rf.mu.Lock()
-	defer rf.mu.Unlock()
 
 	if !ok { //If followers crash or run slowly, or if network packets are lost, the leader retries AppendEntries RPCs indefinitely
 		rf.sendAppendEntries(server, args, reply)
 	} else {
+		rf.mu.Lock()
+		defer rf.mu.Unlock()
+
 		if reply.Term > rf.currentTerm {
 			rf.currentTerm = reply.Term
 			rf.state = FOLLOWER
