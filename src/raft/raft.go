@@ -94,7 +94,7 @@ type LogEntry struct {
 	Command interface{}
 }
 
-const DEBUG_MODE = false
+const DEBUG_MODE = true
 
 // return currentTerm and whether this server
 // believes it is the leader.
@@ -183,9 +183,16 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
+	if DEBUG_MODE {
+		fmt.Printf("peer %d gets vote request from CANDIDATE %d with term %d\n", rf.me, args.CandidateId, rf.currentTerm)
+	}
+
 	if args.Term < rf.currentTerm { //candidate's term is smaller than current peer's term, refuse to vote
 		reply.Term = rf.currentTerm
 		reply.VoteGranted = false
+		if DEBUG_MODE {
+			fmt.Printf("peer %d refuses to vote for CANDIDATE %d with term %d\n", rf.me, args.CandidateId, rf.currentTerm)
+		}
 		return
 	}
 
@@ -193,6 +200,9 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		rf.currentTerm = args.Term
 		rf.state = FOLLOWER
 		rf.votedFor = -1
+		if DEBUG_MODE {
+			fmt.Printf("peer %d becomes FOLLOWER with term %d\n", rf.me, rf.currentTerm)
+		}
 	}
 
 	vote := false
@@ -251,6 +261,9 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 
 	if args.Entries == nil || len(args.Entries) == 0 { //AppendEntries RPC that carry no log entries is heartbeat
 		rf.electionTimer.Reset(rf.randomElectionTimeout())
+		if DEBUG_MODE {
+			fmt.Printf("peer %d gets heartbeat from LEADER %d with term %d\n", rf.me, args.LeaderId, rf.currentTerm)
+		}
 	} else {
 		reply.Success = false
 		//Reply false if log doesn't contain an entry at prevLogIndex,whose term matches prevLogTerm (§5.3)
@@ -604,6 +617,9 @@ func (rf *Raft) heartBeat() {
 				rf.commitIndex,
 			}
 			reply := AppendEntriesReply{}
+			if DEBUG_MODE {
+				fmt.Printf("LEADER %d send heartbeat to peer %d with term %d\n", rf.me, i, rf.currentTerm)
+			}
 			go rf.sendAppendEntries(i, &args, &reply)
 		}
 	}
@@ -611,18 +627,11 @@ func (rf *Raft) heartBeat() {
 
 // rf.log stores entry from index = 1, and rf.log[0] is null(doesn't store any entry)
 func (rf *Raft) getLastLogIndex() int {
-	//if len(rf.log) == 1 {
-	//	return -1
-	//}
 	return len(rf.log) - 1
 }
 
 func (rf *Raft) getLastLogTerm() int {
-	index := rf.getLastLogIndex()
-	if index == 0 {
-		return 0
-	}
-	return rf.log[index].Term
+	return rf.log[rf.getLastLogIndex()].Term
 }
 
 // find the index of the first log entry of given term
@@ -669,7 +678,10 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	//2B
 	rf.applyCh = applyCh
 	rf.log = make([]LogEntry, 1)
-	rf.log = append(rf.log, LogEntry{})
+	rf.log = append(rf.log, LogEntry{
+		0,
+		nil,
+	})
 
 	rf.nextIndex = make([]int, len(peers))
 	rf.matchIndex = make([]int, len(peers))
