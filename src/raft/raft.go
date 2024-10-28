@@ -94,7 +94,7 @@ type LogEntry struct {
 	Command interface{}
 }
 
-const DEBUG_MODE = true
+const DEBUG_MODE = false
 
 // return currentTerm and whether this server
 // believes it is the leader.
@@ -251,7 +251,6 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	defer rf.mu.Unlock()
 
 	reply.Term = rf.currentTerm
-
 	if args.Term < rf.currentTerm {
 		return
 	} else {
@@ -264,46 +263,48 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		if DEBUG_MODE {
 			fmt.Printf("peer %d gets heartbeat from LEADER %d with term %d\n", rf.me, args.LeaderId, rf.currentTerm)
 		}
-	} else {
-		reply.Success = false
-		//Reply false if log doesn't contain an entry at prevLogIndex,whose term matches prevLogTerm (§5.3)
-		if args.PrevLogIndex > rf.getLastLogIndex() {
-			reply.NextIndex = rf.getLastLogIndex() + 1
-			reply.NextTerm = rf.getLastLogTerm()
-			return
-		} else if rf.log[args.PrevLogIndex].Term != args.PrevLogTerm {
-			reply.NextTerm = rf.log[args.PrevLogIndex].Term
-			reply.NextIndex = rf.findFirstIndexOfTerm(reply.NextTerm)
-			rf.log = rf.log[:reply.NextIndex]
-			return
-		}
+		//return
+	}
 
-		reply.Success = true
-		rf.log = rf.log[:args.PrevLogIndex]
-		for _, entry := range args.Entries {
-			rf.log = append(rf.log, entry)
-		}
+	reply.Success = false
+	//Reply false if log doesn't contain an entry at prevLogIndex,whose term matches prevLogTerm (§5.3)
+	if args.PrevLogIndex > rf.getLastLogIndex() {
+		reply.NextIndex = rf.getLastLogIndex() + 1
+		reply.NextTerm = rf.getLastLogTerm()
+		return
+	} else if rf.log[args.PrevLogIndex].Term != args.PrevLogTerm {
+		reply.NextTerm = rf.log[args.PrevLogIndex].Term
+		reply.NextIndex = rf.findFirstIndexOfTerm(reply.NextTerm)
+		rf.log = rf.log[:reply.NextIndex]
+		return
+	}
 
-		//TODO: what is index of last new entry?
-		if args.LeaderCommit > rf.commitIndex {
-			if args.LeaderCommit < rf.getLastLogIndex() {
-				rf.commitIndex = args.LeaderCommit
-			} else {
-				rf.commitIndex = rf.getLastLogIndex()
-			}
-		}
+	reply.Success = true
+	rf.log = rf.log[:args.PrevLogIndex+1]
+	for _, entry := range args.Entries {
+		rf.log = append(rf.log, entry)
+	}
 
-		for rf.lastApplied < rf.commitIndex && rf.commitIndex < len(rf.log)-1 {
-			rf.lastApplied++
-			rf.applyCh <- ApplyMsg{
-				true,
-				rf.log[rf.lastApplied].Command,
-				rf.lastApplied,
-				false,
-				nil,
-				0,
-				0,
-			}
+	//TODO: what is index of last new entry?
+	if args.LeaderCommit > rf.commitIndex {
+		// rf.commitIndex = min(args.LeaderCommit, rf.getLastLogIndex())
+		if args.LeaderCommit < rf.getLastLogIndex() {
+			rf.commitIndex = args.LeaderCommit
+		} else {
+			rf.commitIndex = rf.getLastLogIndex()
+		}
+	}
+
+	for rf.lastApplied < rf.commitIndex && rf.commitIndex <= len(rf.log)-1 {
+		rf.lastApplied++
+		rf.applyCh <- ApplyMsg{
+			true,
+			rf.log[rf.lastApplied].Command,
+			rf.lastApplied,
+			false,
+			nil,
+			0,
+			0,
 		}
 	}
 
@@ -361,7 +362,7 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 
 					for i := 0; i < len(rf.peers); i++ {
 						rf.nextIndex[i] = rf.getLastLogIndex() + 1
-						rf.matchIndex[i] = 0
+						rf.matchIndex[i] = rf.getLastLogIndex()
 					}
 
 					if DEBUG_MODE {
@@ -380,57 +381,99 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 
 	if !ok { //If followers crash or run slowly, or if network packets are lost, the leader retries AppendEntries RPCs indefinitely
-		rf.sendAppendEntries(server, args, reply)
+		reply := &AppendEntriesReply{}
+		return rf.sendAppendEntries(server, args, reply)
+	}
+
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	if reply.Term > rf.currentTerm {
+		rf.currentTerm = reply.Term
+		rf.state = FOLLOWER
+		rf.votedFor = -1
+		return ok
+	} else if reply.Term != args.Term || rf.state != LEADER {
+		return ok
+	}
+
+	if !reply.Success {
+		rf.nextIndex[server] = reply.NextIndex
+		args.PrevLogIndex = rf.nextIndex[server] - 1
+		args.PrevLogTerm = rf.log[args.PrevLogIndex].Term
+		args.Entries = rf.log[rf.nextIndex[server]:]
+		reply := &AppendEntriesReply{}
+		return rf.sendAppendEntries(server, args, reply)
 	} else {
-		rf.mu.Lock()
-		defer rf.mu.Unlock()
+		if args.Entries == nil || len(args.Entries) == 0 {
+			rf.matchIndex[server] = args.PrevLogIndex
+		} else if args.Entries != nil && len(args.Entries) != 0 {
+			rf.matchIndex[server] = args.PrevLogIndex + 1
+			rf.nextIndex[server] = rf.matchIndex[server] + 1
+		}
 
-		if reply.Term > rf.currentTerm {
-			rf.currentTerm = reply.Term
-			rf.state = FOLLOWER
-			rf.votedFor = -1
+		for N := rf.commitIndex + 1; N < len(rf.log); N++ {
+			count := 0
+			for i := 0; i < len(rf.peers); i++ {
+				if rf.matchIndex[i] >= N {
+					count++
+				}
+			}
+			if count > len(rf.peers)/2 && rf.log[N].Term == rf.currentTerm { //over half of servers commit
+				rf.commitIndex = N
+			}
+		}
 
-			return ok
+		for rf.lastApplied < rf.commitIndex && rf.commitIndex <= len(rf.log)-1 {
+			rf.lastApplied++
+			rf.applyCh <- ApplyMsg{
+				true,
+				rf.log[rf.lastApplied].Command,
+				rf.lastApplied,
+				false,
+				nil,
+				0,
+				0,
+			}
 		}
 
 		//TODO
-		if args.Entries != nil && len(args.Entries) != 0 {
-			if !reply.Success {
-				rf.nextIndex[server] = reply.NextIndex
-				args.PrevLogIndex = rf.nextIndex[server] - 1
-				args.PrevLogTerm = rf.log[args.PrevLogIndex].Term
-				args.Entries = rf.log[rf.nextIndex[server]:]
-				go rf.sendAppendEntries(server, args, reply)
-			} else {
-				rf.matchIndex[server] = args.PrevLogIndex + 1
-				rf.nextIndex[server] = rf.matchIndex[server] + 1
-
-				for N := rf.commitIndex + 1; N < len(rf.log); N++ {
-					count := 0
-					for i := 0; i < len(rf.peers); i++ {
-						if rf.matchIndex[i] >= N {
-							count++
-						}
-					}
-					if count > len(rf.peers)/2 && rf.log[N].Term == rf.currentTerm { //over half of servers commit
-						rf.commitIndex = N
-					}
-				}
-
-				for rf.lastApplied < rf.commitIndex && rf.commitIndex < len(rf.log)-1 {
-					rf.lastApplied++
-					rf.applyCh <- ApplyMsg{
-						true,
-						rf.log[rf.lastApplied].Command,
-						rf.lastApplied,
-						false,
-						nil,
-						0,
-						0,
-					}
-				}
-			}
-		}
+		//if rf.state == LEADER && args.Entries != nil && len(args.Entries) != 0 {
+		//	if !reply.Success {
+		//		rf.nextIndex[server] = reply.NextIndex
+		//		args.PrevLogIndex = rf.nextIndex[server] - 1
+		//		args.PrevLogTerm = rf.log[args.PrevLogIndex].Term
+		//		args.Entries = rf.log[rf.nextIndex[server]:]
+		//		go rf.sendAppendEntries(server, args, reply)
+		//	} else {
+		//		rf.matchIndex[server] = args.PrevLogIndex + 1
+		//		rf.nextIndex[server] = rf.matchIndex[server] + 1
+		//
+		//		for N := rf.commitIndex + 1; N < len(rf.log); N++ {
+		//			count := 0
+		//			for i := 0; i < len(rf.peers); i++ {
+		//				if rf.matchIndex[i] >= N {
+		//					count++
+		//				}
+		//			}
+		//			if count > len(rf.peers)/2 && rf.log[N].Term == rf.currentTerm { //over half of servers commit
+		//				rf.commitIndex = N
+		//			}
+		//		}
+		//
+		//		for rf.lastApplied < rf.commitIndex && rf.commitIndex <= len(rf.log)-1 {
+		//			rf.lastApplied++
+		//			rf.applyCh <- ApplyMsg{
+		//				true,
+		//				rf.log[rf.lastApplied].Command,
+		//				rf.lastApplied,
+		//				false,
+		//				nil,
+		//				0,
+		//				0,
+		//			}
+		//		}
+		//	}
 	}
 
 	return ok
@@ -461,13 +504,16 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		rf.matchIndex[rf.me]++
 		rf.nextIndex[rf.me]++
 
+		if DEBUG_MODE {
+			fmt.Printf("LEADER %d gets command %d\n", rf.me, command)
+		}
 		rf.log = append(rf.log, LogEntry{
 			rf.currentTerm,
 			command,
 		})
 
 		for i := range rf.peers {
-			if i != rf.me && rf.getLastLogIndex() > rf.nextIndex[i] {
+			if i != rf.me && rf.getLastLogIndex() >= rf.nextIndex[i] {
 				prevLogIndex := rf.nextIndex[i] - 1
 				prevLogTerm := rf.log[prevLogIndex].Term
 
@@ -642,7 +688,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	//2B
 	rf.applyCh = applyCh
-	rf.log = make([]LogEntry, 1)
+	rf.log = make([]LogEntry, 0)
 	rf.log = append(rf.log, LogEntry{
 		0,
 		nil,
