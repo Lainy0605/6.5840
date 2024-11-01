@@ -220,7 +220,6 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		rf.state = FOLLOWER
 		reply.VoteGranted = true
 		rf.votedFor = args.CandidateId
-		rf.electionTimer.Reset(rf.randomElectionTimeout())
 
 		if DEBUG_MODE {
 			fmt.Printf("peer %d votes for %d with term %d\n", rf.me, rf.votedFor, rf.currentTerm)
@@ -356,7 +355,6 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 				rf.voteCount++
 				if rf.voteCount > len(rf.peers)/2 {
 					rf.state = LEADER
-					rf.electionTimer.Stop() //LEADER doesn't need election timeout
 					rf.nextIndex = make([]int, len(rf.peers))
 					rf.matchIndex = make([]int, len(rf.peers))
 
@@ -436,44 +434,6 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 				0,
 			}
 		}
-
-		//TODO
-		//if rf.state == LEADER && args.Entries != nil && len(args.Entries) != 0 {
-		//	if !reply.Success {
-		//		rf.nextIndex[server] = reply.NextIndex
-		//		args.PrevLogIndex = rf.nextIndex[server] - 1
-		//		args.PrevLogTerm = rf.log[args.PrevLogIndex].Term
-		//		args.Entries = rf.log[rf.nextIndex[server]:]
-		//		go rf.sendAppendEntries(server, args, reply)
-		//	} else {
-		//		rf.matchIndex[server] = args.PrevLogIndex + 1
-		//		rf.nextIndex[server] = rf.matchIndex[server] + 1
-		//
-		//		for N := rf.commitIndex + 1; N < len(rf.log); N++ {
-		//			count := 0
-		//			for i := 0; i < len(rf.peers); i++ {
-		//				if rf.matchIndex[i] >= N {
-		//					count++
-		//				}
-		//			}
-		//			if count > len(rf.peers)/2 && rf.log[N].Term == rf.currentTerm { //over half of servers commit
-		//				rf.commitIndex = N
-		//			}
-		//		}
-		//
-		//		for rf.lastApplied < rf.commitIndex && rf.commitIndex <= len(rf.log)-1 {
-		//			rf.lastApplied++
-		//			rf.applyCh <- ApplyMsg{
-		//				true,
-		//				rf.log[rf.lastApplied].Command,
-		//				rf.lastApplied,
-		//				false,
-		//				nil,
-		//				0,
-		//				0,
-		//			}
-		//		}
-		//	}
 	}
 
 	return ok
@@ -512,6 +472,10 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 			command,
 		})
 
+		//The leader
+		//appends the command to its log as a new entry, then issues
+		//AppendEntries RPCs in parallel to each of the other
+		//servers to replicate the entry.
 		for i := range rf.peers {
 			if i != rf.me && rf.getLastLogIndex() >= rf.nextIndex[i] {
 				prevLogIndex := rf.nextIndex[i] - 1
@@ -574,6 +538,10 @@ func (rf *Raft) ticker() {
 }
 
 func (rf *Raft) startElection() {
+	if rf.killed() {
+		return
+	}
+
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
@@ -616,6 +584,7 @@ func (rf *Raft) heartBeat() {
 	if rf.state != LEADER {
 		return
 	}
+	rf.electionTimer.Reset(rf.randomElectionTimeout())
 
 	for i := range rf.peers {
 		if i != rf.me {
