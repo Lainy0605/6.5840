@@ -250,6 +250,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	defer rf.mu.Unlock()
 
 	reply.Term = rf.currentTerm
+	reply.Success = false
 	if args.Term < rf.currentTerm {
 		return
 	} else {
@@ -257,15 +258,11 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		rf.currentTerm = args.Term
 	}
 
-	if args.Entries == nil || len(args.Entries) == 0 { //AppendEntries RPC that carry no log entries is heartbeat
-		rf.electionTimer.Reset(rf.randomElectionTimeout())
-		if DEBUG_MODE {
-			fmt.Printf("peer %d gets heartbeat from LEADER %d with term %d\n", rf.me, args.LeaderId, rf.currentTerm)
-		}
-		//return
+	rf.electionTimer.Reset(rf.randomElectionTimeout())
+	if DEBUG_MODE {
+		fmt.Printf("peer %d gets heartbeat from LEADER %d with term %d\n", rf.me, args.LeaderId, rf.currentTerm)
 	}
 
-	reply.Success = false
 	//Reply false if log doesn't contain an entry at prevLogIndex,whose term matches prevLogTerm (§5.3)
 	if args.PrevLogIndex > rf.getLastLogIndex() {
 		reply.NextIndex = rf.getLastLogIndex() + 1
@@ -279,9 +276,11 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 
 	reply.Success = true
-	rf.log = rf.log[:args.PrevLogIndex+1]
-	for _, entry := range args.Entries {
-		rf.log = append(rf.log, entry)
+	rf.log = rf.log[:args.PrevLogIndex+1] //[:index)
+	if args.Entries != nil {
+		for _, entry := range args.Entries {
+			rf.log = append(rf.log, entry)
+		}
 	}
 
 	//TODO: what is index of last new entry?
@@ -378,9 +377,11 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *AppendEntriesReply) bool {
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 
-	if !ok { //If followers crash or run slowly, or if network packets are lost, the leader retries AppendEntries RPCs indefinitely
-		reply := &AppendEntriesReply{}
-		return rf.sendAppendEntries(server, args, reply)
+	for !ok { //If followers crash or run slowly, or if network packets are lost, the leader retries AppendEntries RPCs indefinitely
+		if rf.killed() {
+			return false
+		}
+		ok = rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	}
 
 	rf.mu.Lock()
@@ -396,17 +397,13 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 	}
 
 	if !reply.Success {
+		rf.matchIndex[server] = reply.NextIndex - 1
 		rf.nextIndex[server] = reply.NextIndex
-		args.PrevLogIndex = rf.nextIndex[server] - 1
-		args.PrevLogTerm = rf.log[args.PrevLogIndex].Term
-		args.Entries = rf.log[rf.nextIndex[server]:]
-		reply := &AppendEntriesReply{}
-		return rf.sendAppendEntries(server, args, reply)
 	} else {
 		if args.Entries == nil || len(args.Entries) == 0 {
 			rf.matchIndex[server] = args.PrevLogIndex
 		} else if args.Entries != nil && len(args.Entries) != 0 {
-			rf.matchIndex[server] = args.PrevLogIndex + 1
+			rf.matchIndex[server] = args.PrevLogIndex + len(args.Entries)
 			rf.nextIndex[server] = rf.matchIndex[server] + 1
 		}
 
@@ -476,24 +473,6 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		//appends the command to its log as a new entry, then issues
 		//AppendEntries RPCs in parallel to each of the other
 		//servers to replicate the entry.
-		for i := range rf.peers {
-			if i != rf.me && rf.getLastLogIndex() >= rf.nextIndex[i] {
-				prevLogIndex := rf.nextIndex[i] - 1
-				prevLogTerm := rf.log[prevLogIndex].Term
-
-				entries := rf.log[rf.nextIndex[i]:]
-				args := AppendEntriesArgs{
-					rf.currentTerm,
-					rf.me,
-					prevLogIndex,
-					prevLogTerm,
-					entries,
-					rf.commitIndex,
-				}
-				reply := AppendEntriesReply{}
-				go rf.sendAppendEntries(i, &args, &reply)
-			}
-		}
 	}
 	return index, term, isLeader
 }
@@ -588,14 +567,20 @@ func (rf *Raft) heartBeat() {
 
 	for i := range rf.peers {
 		if i != rf.me {
+			prevLogIndex := rf.nextIndex[i] - 1
+			prevLogTerm := rf.log[prevLogIndex].Term
 			args := AppendEntriesArgs{
 				rf.currentTerm,
 				rf.me,
-				rf.getLastLogIndex(),
-				rf.getLastLogTerm(),
+				prevLogIndex,
+				prevLogTerm,
 				nil,
 				rf.commitIndex,
 			}
+			if rf.getLastLogIndex() >= rf.nextIndex[i] {
+				args.Entries = rf.log[rf.nextIndex[i]:]
+			}
+
 			reply := AppendEntriesReply{}
 			if DEBUG_MODE {
 				fmt.Printf("LEADER %d send heartbeat to peer %d with term %d\n", rf.me, i, rf.currentTerm)
