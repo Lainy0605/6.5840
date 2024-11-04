@@ -81,6 +81,11 @@ type Raft struct {
 	voteCount      int
 	electionTimer  *time.Timer
 	heartBeatTimer *time.Timer
+
+	//Lab2D
+	snapShot          []byte //the latest snapshot
+	lastIncludedIndex int
+	lastIncludedTerm  int
 }
 
 const HEARTBEAT_INTERVAL = 100 * time.Millisecond
@@ -135,7 +140,7 @@ func (rf *Raft) persist() {
 	}
 
 	raftState := w.Bytes()
-	rf.persister.Save(raftState, nil)
+	rf.persister.Save(raftState, rf.snapShot)
 }
 
 // restore previously persisted state.
@@ -167,7 +172,22 @@ func (rf *Raft) readPersist(data []byte) {
 // that index. Raft should now trim its log as much as possible.
 func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	// Your code here (2D).
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
 
+	if rf.lastApplied < index || rf.lastIncludedIndex <= index {
+		return
+	}
+
+	realIndex := rf.getRealLogIndex(index)
+	oldLength := len(rf.log)
+	rf.log = append([]LogEntry{}, rf.log[realIndex+1:]...)
+	rf.lastIncludedIndex = index
+	rf.snapShot = snapshot
+	if DEBUG_MODE {
+		fmt.Printf("peer %d snapshots log from length %d to %d\n", rf.me, oldLength, len(rf.log))
+	}
+	rf.persist()
 }
 
 // example RequestVote RPC arguments structure.
@@ -618,6 +638,10 @@ func (rf *Raft) getLastLogIndex() int {
 
 func (rf *Raft) getLastLogTerm() int {
 	return rf.log[rf.getLastLogIndex()].Term
+}
+
+func (rf *Raft) getRealLogIndex(index int) int {
+	return index - rf.lastIncludedIndex
 }
 
 // find the index of the first log entry of given term
