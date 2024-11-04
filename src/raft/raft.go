@@ -18,7 +18,11 @@ package raft
 //
 
 import (
+	"6.5840/labgob"
+	"bytes"
 	"fmt"
+	"log"
+
 	//	"bytes"
 	"math/rand"
 	"sync"
@@ -100,16 +104,16 @@ const DEBUG_MODE = false
 // believes it is the leader.
 func (rf *Raft) GetState() (int, bool) {
 	var term int
-	var isleader bool
+	var isLeader bool
 	// Your code here (2A).
 
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
 	term = rf.currentTerm
-	isleader = rf.state == LEADER
+	isLeader = rf.state == LEADER
 
-	return term, isleader
+	return term, isLeader
 }
 
 // save Raft's persistent state to stable storage,
@@ -122,12 +126,16 @@ func (rf *Raft) GetState() (int, bool) {
 func (rf *Raft) persist() {
 	// Your code here (2C).
 	// Example:
-	// w := new(bytes.Buffer)
-	// e := labgob.NewEncoder(w)
-	// e.Encode(rf.xxx)
-	// e.Encode(rf.yyy)
-	// raftstate := w.Bytes()
-	// rf.persister.Save(raftstate, nil)
+	w := new(bytes.Buffer)
+	e := labgob.NewEncoder(w)
+	if e.Encode(rf.currentTerm) != nil ||
+		e.Encode(rf.votedFor) != nil ||
+		e.Encode(rf.log) != nil {
+		log.Fatal("Encode error")
+	}
+
+	raftState := w.Bytes()
+	rf.persister.Save(raftState, nil)
 }
 
 // restore previously persisted state.
@@ -136,18 +144,21 @@ func (rf *Raft) readPersist(data []byte) {
 		return
 	}
 	// Your code here (2C).
-	// Example:
-	// r := bytes.NewBuffer(data)
-	// d := labgob.NewDecoder(r)
-	// var xxx
-	// var yyy
-	// if d.Decode(&xxx) != nil ||
-	//    d.Decode(&yyy) != nil {
-	//   error...
-	// } else {
-	//   rf.xxx = xxx
-	//   rf.yyy = yyy
-	// }
+	r := bytes.NewBuffer(data)
+	d := labgob.NewDecoder(r)
+	var currentTerm int
+	var votedFor int
+	var Log []LogEntry
+
+	if d.Decode(&currentTerm) != nil ||
+		d.Decode(&votedFor) != nil ||
+		d.Decode(&Log) != nil {
+		log.Fatal("decode error")
+	} else {
+		rf.currentTerm = currentTerm
+		rf.votedFor = votedFor
+		rf.log = Log
+	}
 }
 
 // the service says it has created a snapshot that has
@@ -200,6 +211,8 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		rf.currentTerm = args.Term
 		rf.state = FOLLOWER
 		rf.votedFor = -1
+		rf.persist()
+
 		if DEBUG_MODE {
 			fmt.Printf("peer %d becomes FOLLOWER with term %d\n", rf.me, rf.currentTerm)
 		}
@@ -220,6 +233,7 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		rf.state = FOLLOWER
 		reply.VoteGranted = true
 		rf.votedFor = args.CandidateId
+		rf.persist()
 
 		if DEBUG_MODE {
 			fmt.Printf("peer %d votes for %d with term %d\n", rf.me, rf.votedFor, rf.currentTerm)
@@ -256,6 +270,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	} else {
 		rf.state = FOLLOWER
 		rf.currentTerm = args.Term
+		rf.persist()
 	}
 
 	rf.electionTimer.Reset(rf.randomElectionTimeout())
@@ -272,14 +287,17 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		reply.NextTerm = rf.log[args.PrevLogIndex].Term
 		reply.NextIndex = rf.findFirstIndexOfTerm(reply.NextTerm)
 		rf.log = rf.log[:reply.NextIndex]
+		rf.persist()
 		return
 	}
 
 	reply.Success = true
 	rf.log = rf.log[:args.PrevLogIndex+1] //[:index)
+	rf.persist()
 	if args.Entries != nil {
 		for _, entry := range args.Entries {
 			rf.log = append(rf.log, entry)
+			rf.persist()
 		}
 	}
 
@@ -346,6 +364,7 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 			rf.currentTerm = reply.Term
 			rf.state = FOLLOWER
 			rf.votedFor = -1
+			rf.persist()
 		} else if rf.state == CANDIDATE { //maybe it has become FOLLOWER or LEADER, do not accept remaining votes
 			if reply.VoteGranted && args.Term == rf.currentTerm { //maybe get in next term
 				if DEBUG_MODE {
@@ -391,6 +410,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 		rf.currentTerm = reply.Term
 		rf.state = FOLLOWER
 		rf.votedFor = -1
+		rf.persist()
 		return ok
 	} else if reply.Term != args.Term || rf.state != LEADER {
 		return ok
@@ -468,7 +488,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 			rf.currentTerm,
 			command,
 		})
-
+		rf.persist()
 		//The leader
 		//appends the command to its log as a new entry, then issues
 		//AppendEntries RPCs in parallel to each of the other
@@ -538,6 +558,7 @@ func (rf *Raft) startElection() {
 	rf.state = CANDIDATE
 	rf.votedFor = rf.me
 	rf.voteCount = 1
+	rf.persist()
 
 	for i := range rf.peers { // send RequestRPC to all other peers
 		if i != rf.me {
