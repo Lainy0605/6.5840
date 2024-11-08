@@ -183,14 +183,15 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	if rf.lastApplied < index || rf.lastIncludedIndex <= index {
+	if rf.lastApplied < index || index <= rf.lastIncludedIndex {
 		return
 	}
 
 	relativeIndex := rf.getRelativeLogIndex(index)
 	oldLength := len(rf.log)
-	rf.log = rf.log[relativeIndex:]
 	rf.lastIncludedIndex = index
+	rf.lastIncludedTerm = rf.log[relativeIndex].Term
+	rf.log = rf.log[relativeIndex:]
 	rf.snapShot = snapshot
 	if DEBUG_MODE {
 		fmt.Printf("peer %d snapshots log from length %d to %d\n", rf.me, oldLength, len(rf.log))
@@ -714,42 +715,42 @@ func (rf *Raft) heartBeat() {
 
 	for i := range rf.peers {
 		if i != rf.me {
-			prevLogIndex := rf.nextIndex[i] - 1
-			prevLogTerm := rf.log[rf.getRelativeLogIndex(prevLogIndex)].Term
-			args := AppendEntriesArgs{
-				rf.currentTerm,
-				rf.me,
-				prevLogIndex,
-				prevLogTerm,
-				nil,
-				rf.commitIndex,
-			}
-			if rf.getLastLogIndex() >= rf.nextIndex[i] {
-				if rf.nextIndex[i] <= rf.lastIncludedIndex {
-					args := InstallSnapshotArgs{
-						rf.currentTerm,
-						rf.me,
-						rf.lastIncludedIndex,
-						rf.lastIncludedTerm,
-						rf.snapShot,
-						0,
-						false,
-					}
-					reply := InstallSnapshotReply{}
-					if DEBUG_MODE {
-						fmt.Printf("LEADER %d send InstallSnapshot to peer %d with term %d\n", rf.me, i, rf.currentTerm)
-					}
-					go rf.sendInstallSnapshot(i, &args, &reply)
-				} else {
+			if rf.nextIndex[i] <= rf.lastIncludedIndex {
+				args := InstallSnapshotArgs{
+					rf.currentTerm,
+					rf.me,
+					rf.lastIncludedIndex,
+					rf.lastIncludedTerm,
+					rf.snapShot,
+					0,
+					false,
+				}
+				reply := InstallSnapshotReply{}
+				if DEBUG_MODE {
+					fmt.Printf("LEADER %d send InstallSnapshot to peer %d with term %d\n", rf.me, i, rf.currentTerm)
+				}
+				go rf.sendInstallSnapshot(i, &args, &reply)
+			} else {
+				prevLogIndex := rf.nextIndex[i] - 1
+				prevLogTerm := rf.log[rf.getRelativeLogIndex(prevLogIndex)].Term
+				args := AppendEntriesArgs{
+					rf.currentTerm,
+					rf.me,
+					prevLogIndex,
+					prevLogTerm,
+					nil,
+					rf.commitIndex,
+				}
+				if rf.getLastLogIndex() >= rf.nextIndex[i] {
 					args.Entries = rf.log[rf.getRelativeLogIndex(rf.nextIndex[i]):]
 				}
-			}
 
-			reply := AppendEntriesReply{}
-			if DEBUG_MODE {
-				fmt.Printf("LEADER %d send heartbeat to peer %d with term %d\n", rf.me, i, rf.currentTerm)
+				reply := AppendEntriesReply{}
+				if DEBUG_MODE {
+					fmt.Printf("LEADER %d send heartbeat to peer %d with term %d\n", rf.me, i, rf.currentTerm)
+				}
+				go rf.sendAppendEntries(i, &args, &reply)
 			}
-			go rf.sendAppendEntries(i, &args, &reply)
 		}
 	}
 }
