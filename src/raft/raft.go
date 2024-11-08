@@ -70,8 +70,8 @@ type Raft struct {
 	log         []LogEntry
 	state       State
 
-	commitIndex int
-	lastApplied int
+	commitIndex int //index of highest log entry known to be committed
+	lastApplied int //index of highest log entry applied to state machine
 
 	applyCh    chan ApplyMsg
 	nextIndex  []int //for each server, index of the next log entry to send to that server
@@ -84,8 +84,8 @@ type Raft struct {
 
 	//Lab2D
 	snapShot          []byte //the latest snapshot
-	lastIncludedIndex int
-	lastIncludedTerm  int
+	lastIncludedIndex int    //the snapshot replaces all entries up through and including this index
+	lastIncludedTerm  int    //term of lastIncludedIndex
 }
 
 const HEARTBEAT_INTERVAL = 100 * time.Millisecond
@@ -179,15 +179,89 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 		return
 	}
 
-	realIndex := rf.getRealLogIndex(index)
+	relativeIndex := rf.getRelativeLogIndex(index)
 	oldLength := len(rf.log)
-	rf.log = append([]LogEntry{}, rf.log[realIndex+1:]...)
+	rf.log = rf.log[relativeIndex:]
 	rf.lastIncludedIndex = index
 	rf.snapShot = snapshot
 	if DEBUG_MODE {
 		fmt.Printf("peer %d snapshots log from length %d to %d\n", rf.me, oldLength, len(rf.log))
 	}
 	rf.persist()
+}
+
+type InstallSnapshotArgs struct {
+	Term              int
+	LeaderId          int
+	LastIncludedIndex int
+	LastIncludedTerm  int
+	Data              []byte
+	//Send the entire snapshot in a single InstallSnapshot RPC. Don't implement Figure 13's offset mechanism for splitting up the snapshot.
+	Offset int  //not use
+	Done   bool //not use
+}
+
+type InstallSnapshotReply struct {
+	Term int
+}
+
+func (rf *Raft) InstallSnapshot(args *InstallSnapshotArgs, reply *InstallSnapshotReply) {
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	// 1. Reply immediately if term < currentTerm
+	if args.Term < rf.currentTerm {
+		reply.Term = rf.currentTerm
+		return
+	} else if args.Term > rf.currentTerm {
+		rf.currentTerm = args.Term
+		rf.votedFor = -1
+	}
+
+	rf.state = FOLLOWER
+	rf.electionTimer.Reset(rf.randomElectionTimeout())
+
+	if args.LastIncludedIndex <= rf.lastIncludedIndex {
+		reply.Term = rf.currentTerm
+		return
+	}
+
+	//If existing log entry has same index and term as snapshot’s
+	//last included entry, retain log entries following it and reply
+	relativeLogIndex := rf.getRelativeLogIndex(args.LastIncludedIndex)
+	if rf.log[relativeLogIndex].Term == args.LastIncludedTerm {
+		rf.log = rf.log[relativeLogIndex:]
+	} else {
+		rf.log = append([]LogEntry{{
+			args.LastIncludedTerm,
+			nil,
+		}})
+	}
+
+	rf.lastIncludedIndex = args.LastIncludedIndex
+	rf.lastIncludedTerm = args.LastIncludedTerm
+	rf.snapShot = args.Data
+
+	if rf.commitIndex < args.LastIncludedIndex {
+		rf.commitIndex = args.LastIncludedIndex
+	}
+
+	if rf.lastApplied < args.LastIncludedIndex {
+		rf.lastApplied = args.LastIncludedIndex
+	}
+
+	rf.applyCh <- ApplyMsg{
+		false,
+		nil,
+		0,
+		true,
+		args.Data,
+		args.LastIncludedTerm,
+		args.LastIncludedIndex,
+	}
+
+	defer rf.persist()
+	return
 }
 
 // example RequestVote RPC arguments structure.
@@ -345,6 +419,26 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 
 	return
+}
+
+func (rf *Raft) sendInstallSnapshot(server int, args *InstallSnapshotArgs, reply *InstallSnapshotReply) bool {
+	ok := rf.peers[server].Call("Raft.InstallSnapshot", args, reply)
+	rf.mu.Lock()
+	defer rf.mu.Lock()
+
+	if ok {
+		if reply.Term > rf.currentTerm {
+			rf.currentTerm = reply.Term
+			rf.state = FOLLOWER
+			rf.votedFor = -1
+			rf.persist()
+		} else {
+			rf.nextIndex[server] = args.LastIncludedIndex + 1
+			rf.matchIndex[server] = args.LastIncludedIndex
+		}
+	}
+
+	return ok
 }
 
 // example code to send a RequestVote RPC to a server.
@@ -644,6 +738,14 @@ func (rf *Raft) getRealLogIndex(index int) int {
 	return index - rf.lastIncludedIndex
 }
 
+func (rf *Raft) getAbsoluteLogIndex(index int) int {
+	return index + rf.lastIncludedIndex
+}
+
+func (rf *Raft) getRelativeLogIndex(index int) int {
+	return index - rf.lastIncludedIndex
+}
+
 // find the index of the first log entry of given term
 func (rf *Raft) findFirstIndexOfTerm(term int) int {
 	for i := 1; i < len(rf.log); i++ {
@@ -695,6 +797,9 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	rf.nextIndex = make([]int, len(peers))
 	rf.matchIndex = make([]int, len(peers))
+
+	//2D
+	rf.snapShot = nil
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
