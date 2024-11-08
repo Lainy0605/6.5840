@@ -103,7 +103,7 @@ type LogEntry struct {
 	Command interface{}
 }
 
-const DEBUG_MODE = false
+const DEBUG_MODE = true
 
 // return currentTerm and whether this server
 // believes it is the leader.
@@ -135,7 +135,9 @@ func (rf *Raft) persist() {
 	e := labgob.NewEncoder(w)
 	if e.Encode(rf.currentTerm) != nil ||
 		e.Encode(rf.votedFor) != nil ||
-		e.Encode(rf.log) != nil {
+		e.Encode(rf.log) != nil ||
+		e.Encode(rf.lastIncludedIndex) != nil ||
+		e.Encode(rf.lastIncludedTerm) != nil {
 		log.Fatal("Encode error")
 	}
 
@@ -154,15 +156,21 @@ func (rf *Raft) readPersist(data []byte) {
 	var currentTerm int
 	var votedFor int
 	var Log []LogEntry
+	var lastIncludedIndex int
+	var lastIncludedTerm int
 
 	if d.Decode(&currentTerm) != nil ||
 		d.Decode(&votedFor) != nil ||
-		d.Decode(&Log) != nil {
+		d.Decode(&Log) != nil ||
+		d.Decode(&lastIncludedIndex) != nil ||
+		d.Decode(&lastIncludedTerm) != nil {
 		log.Fatal("decode error")
 	} else {
 		rf.currentTerm = currentTerm
 		rf.votedFor = votedFor
 		rf.log = Log
+		rf.lastIncludedIndex = lastIncludedIndex
+		rf.lastIncludedTerm = lastIncludedTerm
 	}
 }
 
@@ -377,16 +385,20 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		reply.NextIndex = rf.getLastLogIndex() + 1
 		reply.NextTerm = rf.getLastLogTerm()
 		return
-	} else if rf.log[args.PrevLogIndex].Term != args.PrevLogTerm {
-		reply.NextTerm = rf.log[args.PrevLogIndex].Term
+	} else if rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term != args.PrevLogTerm {
+		reply.NextTerm = rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term
 		reply.NextIndex = rf.findFirstIndexOfTerm(reply.NextTerm)
-		rf.log = rf.log[:reply.NextIndex]
+		if reply.NextIndex == 0 {
+			rf.log = []LogEntry{{0, nil}}
+		} else {
+			rf.log = rf.log[:rf.getRelativeLogIndex(reply.NextIndex)]
+		}
 		rf.persist()
 		return
 	}
 
 	reply.Success = true
-	rf.log = rf.log[:args.PrevLogIndex+1] //[:index)
+	rf.log = rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)] //[:index)
 	rf.persist()
 	if args.Entries != nil {
 		for _, entry := range args.Entries {
@@ -409,7 +421,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		rf.lastApplied++
 		rf.applyCh <- ApplyMsg{
 			true,
-			rf.log[rf.lastApplied].Command,
+			rf.log[rf.getRelativeLogIndex(rf.lastApplied)].Command,
 			rf.lastApplied,
 			false,
 			nil,
@@ -541,14 +553,14 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 			rf.nextIndex[server] = rf.matchIndex[server] + 1
 		}
 
-		for N := rf.commitIndex + 1; N < len(rf.log); N++ {
+		for N := rf.commitIndex + 1; N <= rf.getLastLogIndex(); N++ {
 			count := 0
 			for i := 0; i < len(rf.peers); i++ {
 				if rf.matchIndex[i] >= N {
 					count++
 				}
 			}
-			if count > len(rf.peers)/2 && rf.log[N].Term == rf.currentTerm { //over half of servers commit
+			if count > len(rf.peers)/2 && rf.log[rf.getRelativeLogIndex(N)].Term == rf.currentTerm { //over half of servers commit
 				rf.commitIndex = N
 			}
 		}
@@ -557,7 +569,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 			rf.lastApplied++
 			rf.applyCh <- ApplyMsg{
 				true,
-				rf.log[rf.lastApplied].Command,
+				rf.log[rf.getRelativeLogIndex(rf.lastApplied)].Command,
 				rf.lastApplied,
 				false,
 				nil,
@@ -703,7 +715,7 @@ func (rf *Raft) heartBeat() {
 	for i := range rf.peers {
 		if i != rf.me {
 			prevLogIndex := rf.nextIndex[i] - 1
-			prevLogTerm := rf.log[prevLogIndex].Term
+			prevLogTerm := rf.log[rf.getRelativeLogIndex(prevLogIndex)].Term
 			args := AppendEntriesArgs{
 				rf.currentTerm,
 				rf.me,
@@ -713,7 +725,24 @@ func (rf *Raft) heartBeat() {
 				rf.commitIndex,
 			}
 			if rf.getLastLogIndex() >= rf.nextIndex[i] {
-				args.Entries = rf.log[rf.nextIndex[i]:]
+				if rf.nextIndex[i] <= rf.lastIncludedIndex {
+					args := InstallSnapshotArgs{
+						rf.currentTerm,
+						rf.me,
+						rf.lastIncludedIndex,
+						rf.lastIncludedTerm,
+						rf.snapShot,
+						0,
+						false,
+					}
+					reply := InstallSnapshotReply{}
+					if DEBUG_MODE {
+						fmt.Printf("LEADER %d send InstallSnapshot to peer %d with term %d\n", rf.me, i, rf.currentTerm)
+					}
+					go rf.sendInstallSnapshot(i, &args, &reply)
+				} else {
+					args.Entries = rf.log[rf.getRelativeLogIndex(rf.nextIndex[i]):]
+				}
 			}
 
 			reply := AppendEntriesReply{}
@@ -727,15 +756,11 @@ func (rf *Raft) heartBeat() {
 
 // rf.log stores entry from index = 1, and rf.log[0] is null(doesn't store any entry)
 func (rf *Raft) getLastLogIndex() int {
-	return len(rf.log) - 1
+	return len(rf.log) - 1 + rf.lastIncludedIndex
 }
 
 func (rf *Raft) getLastLogTerm() int {
-	return rf.log[rf.getLastLogIndex()].Term
-}
-
-func (rf *Raft) getRealLogIndex(index int) int {
-	return index - rf.lastIncludedIndex
+	return rf.log[rf.getRelativeLogIndex(rf.getLastLogIndex())].Term
 }
 
 func (rf *Raft) getAbsoluteLogIndex(index int) int {
@@ -750,11 +775,12 @@ func (rf *Raft) getRelativeLogIndex(index int) int {
 func (rf *Raft) findFirstIndexOfTerm(term int) int {
 	for i := 1; i < len(rf.log); i++ {
 		if rf.log[i].Term == term {
-			return i
+			return rf.getAbsoluteLogIndex(i)
 		}
 	}
 
-	return 1
+	//the first log entry doesn't exists in this log, maybe in snapshot
+	return 0
 }
 
 func (rf *Raft) randomElectionTimeout() time.Duration {
@@ -799,6 +825,8 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.matchIndex = make([]int, len(peers))
 
 	//2D
+	rf.lastIncludedIndex = 0
+	rf.lastIncludedTerm = 0
 	rf.snapShot = nil
 
 	// initialize from state persisted before a crash
