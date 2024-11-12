@@ -20,7 +20,6 @@ package raft
 import (
 	"6.5840/labgob"
 	"bytes"
-	"fmt"
 	"log"
 
 	//	"bytes"
@@ -103,8 +102,6 @@ type LogEntry struct {
 	Command interface{}
 }
 
-const DEBUG_MODE = false
-
 // return currentTerm and whether this server
 // believes it is the leader.
 func (rf *Raft) GetState() (int, bool) {
@@ -185,9 +182,7 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	//rf.mu.Lock()
 	//defer rf.mu.Unlock()
 
-	if DEBUG_MODE {
-		fmt.Printf("peer %d starts to snapshot\n", rf.me)
-	}
+	DPrintf("peer %d starts to snapshot\n", rf.me)
 
 	if rf.lastApplied < index || index <= rf.lastIncludedIndex {
 		return
@@ -199,9 +194,8 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	rf.lastIncludedTerm = rf.log[relativeIndex].Term
 	rf.log = rf.log[relativeIndex:]
 	rf.snapShot = snapshot
-	if DEBUG_MODE {
-		fmt.Printf("peer %d snapshots log from length %d to %d\n", rf.me, oldLength, len(rf.log))
-	}
+
+	DPrintf("peer %d snapshots log from length %d to %d\n", rf.me, oldLength, len(rf.log))
 	rf.persist()
 }
 
@@ -277,9 +271,7 @@ func (rf *Raft) InstallSnapshot(args *InstallSnapshotArgs, reply *InstallSnapsho
 
 	rf.persist()
 
-	if DEBUG_MODE {
-		fmt.Printf("peer %d gets installSnapshot from peer %d with lastIncludedIndex %d\n", rf.me, args.LeaderId, args.LastIncludedIndex)
-	}
+	DPrintf("peer %d gets installSnapshot from peer %d with lastIncludedIndex %d\n", rf.me, args.LeaderId, args.LastIncludedIndex)
 	return
 }
 
@@ -307,16 +299,12 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	if DEBUG_MODE {
-		fmt.Printf("peer %d gets vote request from CANDIDATE %d with term %d\n", rf.me, args.CandidateId, rf.currentTerm)
-	}
+	DPrintf("peer %d gets vote request from CANDIDATE %d with term %d\n", rf.me, args.CandidateId, rf.currentTerm)
 
 	if args.Term < rf.currentTerm { //candidate's term is smaller than current peer's term, refuse to vote
 		reply.Term = rf.currentTerm
 		reply.VoteGranted = false
-		if DEBUG_MODE {
-			fmt.Printf("peer %d refuses to vote for CANDIDATE %d with term %d\n", rf.me, args.CandidateId, rf.currentTerm)
-		}
+		DPrintf("peer %d refuses to vote for CANDIDATE %d with term %d\n", rf.me, args.CandidateId, rf.currentTerm)
 		return
 	}
 
@@ -326,9 +314,7 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		rf.votedFor = -1
 		rf.persist()
 
-		if DEBUG_MODE {
-			fmt.Printf("peer %d becomes FOLLOWER with term %d\n", rf.me, rf.currentTerm)
-		}
+		DPrintf("peer %d becomes FOLLOWER with term %d\n", rf.me, rf.currentTerm)
 	}
 
 	vote := false
@@ -348,9 +334,7 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		rf.votedFor = args.CandidateId
 		rf.persist()
 
-		if DEBUG_MODE {
-			fmt.Printf("peer %d votes for %d with term %d\n", rf.me, rf.votedFor, rf.currentTerm)
-		}
+		DPrintf("peer %d votes for %d with term %d\n", rf.me, rf.votedFor, rf.currentTerm)
 	}
 
 	return
@@ -387,9 +371,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 
 	rf.electionTimer.Reset(rf.randomElectionTimeout())
-	if DEBUG_MODE {
-		fmt.Printf("peer %d gets heartbeat from LEADER %d with term %d\n", rf.me, args.LeaderId, rf.currentTerm)
-	}
+	DPrintf("peer %d gets heartbeat from LEADER %d with term %d\n", rf.me, args.LeaderId, rf.currentTerm)
 
 	//Reply false if log doesn't contain an entry at prevLogIndex,whose term matches prevLogTerm (§5.3)
 	if args.PrevLogIndex > rf.getLastLogIndex() {
@@ -505,9 +487,8 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 			rf.persist()
 		} else if rf.state == CANDIDATE { //maybe it has become FOLLOWER or LEADER, do not accept remaining votes
 			if reply.VoteGranted && args.Term == rf.currentTerm { //maybe get in next term
-				if DEBUG_MODE {
-					fmt.Printf("Candidate %d gets vote from %d\n", rf.me, server)
-				}
+				DPrintf("Candidate %d gets vote from %d\n", rf.me, server)
+
 				rf.voteCount++
 				if rf.voteCount > len(rf.peers)/2 {
 					rf.state = LEADER
@@ -519,9 +500,7 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 						rf.matchIndex[i] = rf.getLastLogIndex()
 					}
 
-					if DEBUG_MODE {
-						fmt.Printf("Candidate %d becomes LEADER\n", rf.me)
-					}
+					DPrintf("Candidate %d becomes LEADER\n", rf.me)
 
 					go rf.heartBeat()
 				}
@@ -554,7 +533,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 		rf.persist()
 		return ok
 	} else if reply.Term != args.Term || args.Term != rf.currentTerm || rf.state != LEADER {
-		_, _ = DPrintf("old AppendEntries RPC")
+		DPrintf("old AppendEntries RPC")
 		return ok
 	}
 
@@ -623,9 +602,8 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		rf.matchIndex[rf.me]++
 		rf.nextIndex[rf.me]++
 
-		if DEBUG_MODE {
-			fmt.Printf("LEADER %d gets command %d\n", rf.me, command)
-		}
+		DPrintf("LEADER %d gets command %d\n", rf.me, command)
+
 		rf.log = append(rf.log, LogEntry{
 			rf.currentTerm,
 			command,
@@ -691,9 +669,7 @@ func (rf *Raft) startElection() {
 		return
 	}
 
-	if DEBUG_MODE {
-		fmt.Printf("peer %d starts election\n", rf.me)
-	}
+	DPrintf("peer %d starts election\n", rf.me)
 
 	rf.electionTimer.Reset(rf.randomElectionTimeout())
 	rf.currentTerm++
@@ -711,9 +687,8 @@ func (rf *Raft) startElection() {
 				rf.getLastLogTerm(),
 			}
 			reply := RequestVoteReply{}
-			if DEBUG_MODE {
-				fmt.Printf("Candidate %d requests peer %d's vote with term %d\n", rf.me, i, rf.currentTerm)
-			}
+			DPrintf("Candidate %d requests peer %d's vote with term %d\n", rf.me, i, rf.currentTerm)
+
 			go rf.sendRequestVote(i, &args, &reply)
 		}
 	}
@@ -741,9 +716,8 @@ func (rf *Raft) heartBeat() {
 					false,
 				}
 				reply := InstallSnapshotReply{}
-				if DEBUG_MODE {
-					fmt.Printf("LEADER %d send InstallSnapshot to peer %d with term %d\n", rf.me, i, rf.currentTerm)
-				}
+				DPrintf("LEADER %d send InstallSnapshot to peer %d with term %d\n", rf.me, i, rf.currentTerm)
+
 				go rf.sendInstallSnapshot(i, &args, &reply)
 			} else {
 				prevLogIndex := rf.nextIndex[i] - 1
@@ -761,9 +735,7 @@ func (rf *Raft) heartBeat() {
 				}
 
 				reply := AppendEntriesReply{}
-				if DEBUG_MODE {
-					fmt.Printf("LEADER %d send heartbeat to peer %d with term %d\n", rf.me, i, rf.currentTerm)
-				}
+				DPrintf("LEADER %d send heartbeat to peer %d with term %d\n", rf.me, i, rf.currentTerm)
 				go rf.sendAppendEntries(i, &args, &reply)
 			}
 		}
