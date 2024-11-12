@@ -366,10 +366,10 @@ type AppendEntriesArgs struct {
 }
 
 type AppendEntriesReply struct {
-	Term      int
-	Success   bool
-	NextTerm  int //which term that leader's appendLog should begin from
-	NextIndex int //the index of leader's appendLog should begin from
+	Term    int
+	Success bool
+	XTerm   int //which term that leader's appendLog should begin from
+	XIndex  int //the index of leader's appendLog should begin from
 }
 
 func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply) {
@@ -393,17 +393,18 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 
 	//Reply false if log doesn't contain an entry at prevLogIndex,whose term matches prevLogTerm (§5.3)
 	if args.PrevLogIndex > rf.getLastLogIndex() {
-		reply.NextIndex = rf.getLastLogIndex() + 1
-		reply.NextTerm = rf.getLastLogTerm()
+		reply.XIndex = rf.getLastLogIndex() + 1
+		reply.XTerm = rf.getLastLogTerm()
 		return
 	} else if rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term != args.PrevLogTerm {
-		reply.NextTerm = rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term
-		reply.NextIndex = rf.findFirstIndexOfTerm(reply.NextTerm)
-		if reply.NextIndex == 0 {
-			rf.log = []LogEntry{{0, nil}}
-		} else {
-			rf.log = rf.log[:rf.getRelativeLogIndex(reply.NextIndex)]
-		}
+		reply.XTerm = rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term
+		reply.XIndex = rf.findFirstIndexOfTerm(reply.XTerm)
+
+		//if reply.XIndex == 0 {
+		//	rf.log = []LogEntry{{0, nil}}
+		//} else {
+		//	rf.log = rf.log[:rf.getRelativeLogIndex(reply.XIndex)]
+		//}
 		rf.persist()
 		return
 	}
@@ -539,55 +540,57 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 	//}
 	//	ok = rf.peers[server].Call("Raft.AppendEntries", args, reply)
 	//}
+	if !ok {
+		return ok
+	}
 
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	if ok {
-		if reply.Term > rf.currentTerm {
-			rf.currentTerm = reply.Term
-			rf.state = FOLLOWER
-			rf.votedFor = -1
-			rf.persist()
-			return ok
-		} else if reply.Term != args.Term || rf.state != LEADER {
-			return ok
+	if reply.Term > rf.currentTerm {
+		rf.currentTerm = reply.Term
+		rf.state = FOLLOWER
+		rf.votedFor = -1
+		rf.persist()
+		return ok
+	} else if reply.Term != args.Term || args.Term != rf.currentTerm || rf.state != LEADER {
+		_, _ = DPrintf("old AppendEntries RPC")
+		return ok
+	}
+
+	if !reply.Success {
+		rf.matchIndex[server] = reply.XIndex - 1
+		rf.nextIndex[server] = reply.XIndex
+	} else {
+		if args.Entries == nil || len(args.Entries) == 0 {
+			rf.matchIndex[server] = args.PrevLogIndex
+		} else if args.Entries != nil && len(args.Entries) != 0 {
+			rf.matchIndex[server] = args.PrevLogIndex + len(args.Entries)
+			rf.nextIndex[server] = rf.matchIndex[server] + 1
 		}
 
-		if !reply.Success {
-			rf.matchIndex[server] = reply.NextIndex - 1
-			rf.nextIndex[server] = reply.NextIndex
-		} else {
-			if args.Entries == nil || len(args.Entries) == 0 {
-				rf.matchIndex[server] = args.PrevLogIndex
-			} else if args.Entries != nil && len(args.Entries) != 0 {
-				rf.matchIndex[server] = args.PrevLogIndex + len(args.Entries)
-				rf.nextIndex[server] = rf.matchIndex[server] + 1
-			}
-
-			for N := rf.commitIndex + 1; N <= rf.getLastLogIndex(); N++ {
-				count := 0
-				for i := 0; i < len(rf.peers); i++ {
-					if rf.matchIndex[i] >= N {
-						count++
-					}
-				}
-				if count > len(rf.peers)/2 && rf.log[rf.getRelativeLogIndex(N)].Term == rf.currentTerm { //over half of servers commit
-					rf.commitIndex = N
+		for N := rf.commitIndex + 1; N <= rf.getLastLogIndex(); N++ {
+			count := 0
+			for i := 0; i < len(rf.peers); i++ {
+				if rf.matchIndex[i] >= N {
+					count++
 				}
 			}
+			if count > len(rf.peers)/2 && rf.log[rf.getRelativeLogIndex(N)].Term == rf.currentTerm { //over half of servers commit
+				rf.commitIndex = N
+			}
+		}
 
-			for rf.lastApplied < rf.commitIndex && rf.commitIndex <= rf.getLastLogIndex() {
-				rf.lastApplied++
-				rf.applyCh <- ApplyMsg{
-					true,
-					rf.log[rf.getRelativeLogIndex(rf.lastApplied)].Command,
-					rf.lastApplied,
-					false,
-					nil,
-					0,
-					0,
-				}
+		for rf.lastApplied < rf.commitIndex && rf.commitIndex <= rf.getLastLogIndex() {
+			rf.lastApplied++
+			rf.applyCh <- ApplyMsg{
+				true,
+				rf.log[rf.getRelativeLogIndex(rf.lastApplied)].Command,
+				rf.lastApplied,
+				false,
+				nil,
+				0,
+				0,
 			}
 		}
 	}
