@@ -192,7 +192,8 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	oldLength := len(rf.log)
 	rf.lastIncludedIndex = index
 	rf.lastIncludedTerm = rf.log[relativeIndex].Term
-	rf.log = rf.log[relativeIndex:]
+	rf.log = append([]LogEntry(nil), rf.log[relativeIndex:]...)
+	//rf.log = rf.log[relativeIndex:]
 	rf.snapShot = snapshot
 
 	DPrintf("peer %d snapshots log from length %d to %d\n", rf.me, oldLength, len(rf.log))
@@ -239,7 +240,8 @@ func (rf *Raft) InstallSnapshot(args *InstallSnapshotArgs, reply *InstallSnapsho
 	//last included entry, retain log entries following it and reply
 	relativeLogIndex := rf.getRelativeLogIndex(args.LastIncludedIndex)
 	if relativeLogIndex < len(rf.log) && rf.log[relativeLogIndex].Term == args.LastIncludedTerm {
-		rf.log = rf.log[relativeLogIndex:]
+		rf.log = append([]LogEntry(nil), rf.log[relativeLogIndex:]...)
+		//rf.log = rf.log[relativeLogIndex:]
 	} else {
 		rf.log = append([]LogEntry{{
 			args.LastIncludedTerm,
@@ -392,14 +394,14 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 
 	reply.Success = true
-	rf.log = rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)] //[:index)
-	rf.persist()
+	//rf.log = rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)] //[:index)
+	rf.log = append([]LogEntry(nil), rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)]...)
 	if args.Entries != nil {
 		for _, entry := range args.Entries {
 			rf.log = append(rf.log, entry)
-			rf.persist()
 		}
 	}
+	rf.persist()
 
 	//TODO: what is index of last new entry?
 	if args.LeaderCommit > rf.commitIndex {
@@ -731,7 +733,8 @@ func (rf *Raft) heartBeat() {
 					rf.commitIndex,
 				}
 				if rf.getLastLogIndex() >= rf.nextIndex[i] {
-					args.Entries = rf.log[rf.getRelativeLogIndex(rf.nextIndex[i]):]
+					//args.Entries = rf.log[rf.getRelativeLogIndex(rf.nextIndex[i]):]
+					args.Entries = append([]LogEntry(nil), rf.log[rf.getRelativeLogIndex(rf.nextIndex[i]):]...)
 				}
 
 				reply := AppendEntriesReply{}
