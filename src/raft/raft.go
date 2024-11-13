@@ -72,9 +72,10 @@ type Raft struct {
 	commitIndex int //index of highest log entry known to be committed
 	lastApplied int //index of highest log entry applied to state machine
 
-	applyCh    chan ApplyMsg
-	nextIndex  []int //for each server, index of the next log entry to send to that server
-	matchIndex []int //for each server, index of highest log entry known to be replicated on server
+	applyCh     chan ApplyMsg
+	applyChTemp chan ApplyMsg //a temp for applyCh to avoid deadlock when upper service calls rf.snapShot
+	nextIndex   []int         //for each server, index of the next log entry to send to that server
+	matchIndex  []int         //for each server, index of highest log entry known to be replicated on server
 
 	// leader election
 	voteCount      int
@@ -179,8 +180,8 @@ func (rf *Raft) readPersist(data []byte) {
 // that index. Raft should now trim its log as much as possible.
 func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	// Your code here (2D).
-	//rf.mu.Lock()
-	//defer rf.mu.Unlock()
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
 
 	DPrintf("peer %d starts to snapshot\n", rf.me)
 
@@ -261,7 +262,7 @@ func (rf *Raft) InstallSnapshot(args *InstallSnapshotArgs, reply *InstallSnapsho
 		rf.lastApplied = args.LastIncludedIndex
 	}
 
-	rf.applyCh <- ApplyMsg{
+	rf.applyChTemp <- ApplyMsg{
 		false,
 		nil,
 		0,
@@ -415,7 +416,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 
 	for rf.lastApplied < rf.commitIndex && rf.commitIndex <= rf.getLastLogIndex() {
 		rf.lastApplied++
-		rf.applyCh <- ApplyMsg{
+		rf.applyChTemp <- ApplyMsg{
 			true,
 			rf.log[rf.getRelativeLogIndex(rf.lastApplied)].Command,
 			rf.lastApplied,
@@ -564,7 +565,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 
 		for rf.lastApplied < rf.commitIndex && rf.commitIndex <= rf.getLastLogIndex() {
 			rf.lastApplied++
-			rf.applyCh <- ApplyMsg{
+			rf.applyChTemp <- ApplyMsg{
 				true,
 				rf.log[rf.getRelativeLogIndex(rf.lastApplied)].Command,
 				rf.lastApplied,
@@ -779,6 +780,15 @@ func (rf *Raft) randomElectionTimeout() time.Duration {
 	return time.Duration(ms) * time.Millisecond
 }
 
+// use a temp channel to avoid deadlock between snapshot & rf.applyCh
+func (rf *Raft) applier() {
+	for rf.killed() == false {
+		for msg := range rf.applyChTemp {
+			rf.applyCh <- msg
+		}
+	}
+}
+
 // the service or tester wants to create a Raft server. the ports
 // of all the Raft servers (including this one) are in peers[]. this
 // server's port is peers[me]. all the servers' peers[] arrays
@@ -806,6 +816,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	//2B
 	rf.applyCh = applyCh
+	rf.applyChTemp = make(chan ApplyMsg, 1000)
 	rf.lastApplied = 0
 	rf.log = make([]LogEntry, 0)
 	rf.log = append(rf.log, LogEntry{
@@ -827,6 +838,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// start ticker goroutine to start elections
 	go rf.ticker()
-
+	go rf.applier()
 	return rf
 }

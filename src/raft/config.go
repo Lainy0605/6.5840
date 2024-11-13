@@ -251,7 +251,8 @@ func (cfg *config) applierSnap(i int, applyCh chan ApplyMsg) {
 					xlog = append(xlog, cfg.logs[i][j])
 				}
 				e.Encode(xlog)
-				rf.Snapshot(m.CommandIndex, w.Bytes())
+				rf.Snapshot(m.CommandIndex, w.Bytes()) //This will cause deadlock, because raft peer who sends rf.applyCh haven't released rf.mu.lock(),
+				//while the same time rf.Snapshot tries to get the lock, then the deadlock occurs.
 			}
 		} else {
 			// Ignore other types of ApplyMsg.
