@@ -183,9 +183,10 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
-	DPrintf("peer %d starts to snapshot\n", rf.me)
+	DPrintf("Snapshot(Peer:%d Term:%d): starts to snapshot\n", rf.me, rf.currentTerm)
 
 	if rf.lastApplied < index || index <= rf.lastIncludedIndex {
+		DPrintf("Snapshot(Peer:%d Term:%d): refuses to snapshot for out-of-date snapshot, rf.lastApplied:%d index:%d rf.lastIncludedIndex:%d\n", rf.me, rf.currentTerm, rf.lastApplied, index, rf.lastIncludedIndex)
 		return
 	}
 
@@ -194,10 +195,9 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 	rf.lastIncludedIndex = index
 	rf.lastIncludedTerm = rf.log[relativeIndex].Term
 	rf.log = append([]LogEntry(nil), rf.log[relativeIndex:]...)
-	//rf.log = rf.log[relativeIndex:]
 	rf.snapShot = snapshot
 
-	DPrintf("peer %d snapshots log from length %d to %d\n", rf.me, oldLength, len(rf.log))
+	DPrintf("Snapshot(Peer:%d Term:%d): snapshots log from length %d to %d\n", rf.me, rf.currentTerm, oldLength, len(rf.log))
 	rf.persist()
 }
 
@@ -274,7 +274,7 @@ func (rf *Raft) InstallSnapshot(args *InstallSnapshotArgs, reply *InstallSnapsho
 
 	rf.persist()
 
-	DPrintf("peer %d gets installSnapshot from peer %d with lastIncludedIndex %d\n", rf.me, args.LeaderId, args.LastIncludedIndex)
+	DPrintf("InstallSnapshotRPC(Peer:%d LEADER:%d Term:%d): gets installSnapshot with lastIncludedIndex %d\n", rf.me, args.LeaderId, rf.currentTerm, args.LastIncludedIndex)
 	return
 }
 
@@ -305,19 +305,18 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	DPrintf("RequestVoteRPC(Peer:%d Term:%d): gets vote request from CANDIDATE:%d\n", rf.me, rf.currentTerm, args.CandidateId)
 
 	if args.Term < rf.currentTerm { //candidate's term is smaller than current peer's term, refuse to vote
+		DPrintf("RequestVoteRPC(Peer:%d Term:%d): refuses to vote for CANDIDATE:%d for bigger term, candidate's term:%d\n", rf.me, rf.currentTerm, args.CandidateId, args.Term)
 		reply.Term = rf.currentTerm
 		reply.VoteGranted = false
-		DPrintf("RequestVoteRPC(Peer:%d Term:%d): refuses to vote for CANDIDATE:%d for bigger term, candidate's term:%d\n", rf.me, rf.currentTerm, args.CandidateId, args.Term)
 		return
 	}
 
 	if args.Term > rf.currentTerm {
+		DPrintf("RequestVoteRPC(Peer:%d Term:%d): becomes FOLLOWER for smaller term, candidate's term:%d\n", rf.me, rf.currentTerm, args.Term)
 		rf.currentTerm = args.Term
 		rf.state = FOLLOWER
 		rf.votedFor = -1
 		rf.persist()
-
-		DPrintf("RequestVoteRPC(Peer:%d Term:%d): becomes FOLLOWER for smaller term, candidate's term:%d\n", rf.me, rf.currentTerm, args.Term)
 	}
 
 	vote := false
@@ -392,7 +391,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 
 	reply.Success = true
 	//rf.log = rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)] //[:index)
-	oldLog := append([]LogEntry(nil), rf.log...)
+	oldLog := append([]LogEntry(nil), rf.log[:]...)
 	rf.log = append([]LogEntry(nil), rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)]...)
 	if args.Entries != nil {
 		for _, entry := range args.Entries {
@@ -441,7 +440,9 @@ func (rf *Raft) sendInstallSnapshot(server int, args *InstallSnapshotArgs, reply
 			rf.state = FOLLOWER
 			rf.votedFor = -1
 			rf.persist()
-		} else {
+		} else if args.Term != rf.currentTerm {
+			DPrintf("old AppendEntries RPC")
+		} else if rf.state == LEADER {
 			rf.nextIndex[server] = args.LastIncludedIndex + 1
 			rf.matchIndex[server] = args.LastIncludedIndex
 		}
@@ -488,6 +489,8 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 			rf.state = FOLLOWER
 			rf.votedFor = -1
 			rf.persist()
+		} else if args.Term != rf.currentTerm {
+			DPrintf("old AppendEntries RPC")
 		} else if rf.state == CANDIDATE { //maybe it has become FOLLOWER or LEADER, do not accept remaining votes
 			if reply.VoteGranted && args.Term == rf.currentTerm { //maybe get in next term
 				DPrintf("sendRequestVote(Candidate:%d Term:%d): get vote from %d\n", rf.me, rf.currentTerm, server)
@@ -535,7 +538,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 		rf.votedFor = -1
 		rf.persist()
 		return ok
-	} else if reply.Term != args.Term || args.Term != rf.currentTerm || rf.state != LEADER {
+	} else if args.Term != rf.currentTerm || rf.state != LEADER {
 		DPrintf("old AppendEntries RPC")
 		return ok
 	}
@@ -718,7 +721,7 @@ func (rf *Raft) heartBeat() {
 					false,
 				}
 				reply := InstallSnapshotReply{}
-				DPrintf("LEADER %d send InstallSnapshot to peer %d with term %d\n", rf.me, i, rf.currentTerm)
+				DPrintf("Heartbeat(LEADER:%d Term:%d): send InstallSnapshot to peer %d\n", rf.me, rf.currentTerm, i)
 
 				go rf.sendInstallSnapshot(i, &args, &reply)
 			} else {
