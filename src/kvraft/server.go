@@ -18,11 +18,21 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 	return
 }
 
-
-type Op struct {
+type OperationArgs struct {
 	// Your definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
+	Type        OperationType
+	Key         string
+	Value       string
+	OperationId int64
+	ClientId    int64
+}
+
+type OperationReply struct {
+	Err         Err
+	Value       string
+	OperationId int64
 }
 
 type KVServer struct {
@@ -35,15 +45,138 @@ type KVServer struct {
 	maxraftstate int // snapshot if log grows this big
 
 	// Your definitions here.
+	db             map[string]string
+	waitCmdApplyCh map[int]*chan OperationReply
+	latestOp       map[int64]*OperationReply
 }
-
 
 func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
 	// Your code here.
+	op := OperationArgs{
+		GET,
+		args.Key,
+		"",
+		args.OperationId,
+		args.ClientId,
+	}
+
+	res := kv.handleOperation(op)
+	reply.Err = res.Err
+	reply.Value = res.Value
 }
 
 func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 	// Your code here.
+	op := OperationArgs{
+		args.Type,
+		args.Key,
+		args.Value,
+		args.OperationId,
+		args.ClientId,
+	}
+
+	res := kv.handleOperation(op)
+	reply.Err = res.Err
+}
+
+func (kv *KVServer) handleOperation(operationArgs OperationArgs) (reply OperationReply) {
+	index, _, isLeader := kv.rf.Start(operationArgs)
+
+	if !isLeader {
+		reply.Err = ErrWrongLeader
+		return
+	}
+
+	kv.mu.Lock()
+	newChan := make(chan OperationReply)
+	kv.waitCmdApplyCh[index] = &newChan
+	DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): 新建管道 %p\n", kv.me, operationArgs.ClientId, operationArgs.OperationId, &newChan)
+	kv.mu.Unlock()
+
+	defer func() {
+		kv.mu.Lock()
+		delete(kv.waitCmdApplyCh, index)
+		close(newChan)
+		kv.mu.Unlock()
+	}()
+
+	select {
+	case msg, success := <-newChan:
+		if success {
+			reply.Err = msg.Err
+			reply.Value = msg.Value
+			return
+		}
+	}
+
+	return
+}
+
+func (kv *KVServer) ApplyDaemon() {
+	for !kv.killed() {
+		appliedLog := <-kv.applyCh
+		if appliedLog.CommandValid {
+			operation := appliedLog.Command.(OperationArgs)
+			var res OperationReply
+			needApply := true
+			kv.mu.Lock()
+			if latestOp, exist := kv.latestOp[operation.ClientId]; exist {
+				if latestOp.OperationId == operation.OperationId {
+					res = *latestOp
+					needApply = false
+				}
+			}
+
+			if needApply {
+				res = kv.DBExecute(&operation)
+				kv.latestOp[operation.ClientId] = &res
+			}
+
+			_, isLeader := kv.rf.GetState()
+			if !isLeader {
+				kv.mu.Unlock()
+				continue
+			}
+
+			responseCh, exist := kv.waitCmdApplyCh[appliedLog.CommandIndex]
+			if !exist {
+				DPrintf("TODO")
+				kv.mu.Unlock()
+				continue
+			}
+
+			kv.mu.Unlock()
+			*responseCh <- res
+		}
+	}
+}
+
+func (kv *KVServer) DBExecute(op *OperationArgs) (res OperationReply) {
+	res.Err = OK
+	res.OperationId = op.OperationId
+	switch op.Type {
+	case GET:
+		if value, exist := kv.db[op.Key]; exist {
+			res.Value = value
+			return
+		} else {
+			res.Err = ErrNoKey
+			return
+		}
+	case PUT:
+		kv.db[op.Key] = op.Value
+		return
+	case APPEND:
+		if value, exist := kv.db[op.Key]; exist {
+			kv.db[op.Key] = value + op.Value
+			return
+		} else {
+			kv.db[op.Key] = op.Value
+			return
+		}
+	}
+
+	return
 }
 
 // the tester calls Kill() when a KVServer instance won't
@@ -80,7 +213,7 @@ func (kv *KVServer) killed() bool {
 func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister, maxraftstate int) *KVServer {
 	// call labgob.Register on structures you want
 	// Go's RPC library to marshall/unmarshall.
-	labgob.Register(Op{})
+	labgob.Register(OperationArgs{})
 
 	kv := new(KVServer)
 	kv.me = me
@@ -92,6 +225,9 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
 
 	// You may need initialization code here.
-
+	kv.db = make(map[string]string)
+	kv.waitCmdApplyCh = make(map[int]*chan OperationReply)
+	kv.latestOp = make(map[int64]*OperationReply)
+	go kv.ApplyDaemon()
 	return kv
 }
