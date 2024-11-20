@@ -544,12 +544,13 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 	}
 
 	if !reply.Success {
-		rf.matchIndex[server] = reply.XIndex - 1
+		//rf.matchIndex[server] = reply.XIndex - 1
 		rf.nextIndex[server] = reply.XIndex
 	} else {
-		if args.Entries == nil || len(args.Entries) == 0 {
-			rf.matchIndex[server] = args.PrevLogIndex
-		} else if args.Entries != nil && len(args.Entries) != 0 {
+		//if args.Entries == nil || len(args.Entries) == 0 {
+		//	rf.matchIndex[server] = args.PrevLogIndex
+		//} else
+		if args.Entries != nil && len(args.Entries) != 0 {
 			rf.matchIndex[server] = args.PrevLogIndex + len(args.Entries)
 			rf.nextIndex[server] = rf.matchIndex[server] + 1
 		}
@@ -561,7 +562,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 					count++
 				}
 			}
-			if count > len(rf.peers)/2 && rf.log[rf.getRelativeLogIndex(N)].Term == rf.currentTerm { //over half of servers commit
+			if count > len(rf.peers)/2 && rf.log[rf.getRelativeLogIndex(N)].Term == rf.currentTerm { //over half of servers commit, Figure 8
 				rf.commitIndex = N
 			}
 		}
@@ -652,6 +653,7 @@ func (rf *Raft) ticker() {
 		// Check if a leader election should be started.
 		select {
 		case <-rf.electionTimer.C:
+			rf.electionTimer.Reset(rf.randomElectionTimeout())
 			rf.startElection()
 		case <-rf.heartBeatTimer.C:
 			rf.heartBeatTimer.Reset(HEARTBEAT_INTERVAL)
@@ -678,7 +680,6 @@ func (rf *Raft) startElection() {
 		return
 	}
 
-	rf.electionTimer.Reset(rf.randomElectionTimeout())
 	rf.currentTerm++
 	rf.state = CANDIDATE
 	rf.votedFor = rf.me
@@ -709,7 +710,6 @@ func (rf *Raft) heartBeat() {
 	if rf.state != LEADER {
 		return
 	}
-	rf.electionTimer.Reset(rf.randomElectionTimeout())
 
 	for i := range rf.peers {
 		if i != rf.me {
@@ -781,7 +781,7 @@ func (rf *Raft) findFirstIndexOfTerm(term int) int {
 }
 
 func (rf *Raft) randomElectionTimeout() time.Duration {
-	ms := 500 + (rand.Int63() % 500)
+	ms := 200 + (rand.Int63() % 200)
 	return time.Duration(ms) * time.Millisecond
 }
 
