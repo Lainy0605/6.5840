@@ -7,6 +7,7 @@ import (
 	"log"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 const Debug = false
@@ -17,6 +18,8 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 	}
 	return
 }
+
+const OperationTimeOut = 1 * time.Second
 
 type OperationArgs struct {
 	// Your definitions here.
@@ -33,6 +36,8 @@ type OperationReply struct {
 	Err         Err
 	Value       string
 	OperationId int64
+	ClientId    int64
+	Term        int
 }
 
 type KVServer struct {
@@ -80,7 +85,7 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 }
 
 func (kv *KVServer) handleOperation(operationArgs OperationArgs) (reply OperationReply) {
-	index, _, isLeader := kv.rf.Start(operationArgs)
+	index, term, isLeader := kv.rf.Start(operationArgs)
 
 	if !isLeader {
 		reply.Err = ErrWrongLeader
@@ -90,23 +95,29 @@ func (kv *KVServer) handleOperation(operationArgs OperationArgs) (reply Operatio
 	kv.mu.Lock()
 	newChan := make(chan OperationReply)
 	kv.waitCmdApplyCh[index] = &newChan
-	DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): 新建管道 %p\n", kv.me, operationArgs.ClientId, operationArgs.OperationId, &newChan)
+	DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): create new waitCmdApplyCh:%p\n", kv.me, operationArgs.ClientId, operationArgs.OperationId, &newChan)
 	kv.mu.Unlock()
 
 	defer func() {
 		kv.mu.Lock()
-		delete(kv.waitCmdApplyCh, index)
 		close(newChan)
+		delete(kv.waitCmdApplyCh, index)
 		kv.mu.Unlock()
 	}()
 
 	select {
 	case msg, success := <-newChan:
 		if success {
-			reply.Err = msg.Err
-			reply.Value = msg.Value
-			return
+			if msg.OperationId == operationArgs.OperationId && msg.ClientId == operationArgs.ClientId && term == msg.Term {
+				reply = msg
+			} else {
+				reply.Err = ErrLeaderOutOfDate
+			}
+		} else if !success {
+			reply.Err = ErrChanClosed
 		}
+	case <-time.After(OperationTimeOut):
+		reply.Err = ErrOperationTimeOut
 	}
 
 	return
@@ -140,11 +151,10 @@ func (kv *KVServer) ApplyDaemon() {
 
 			responseCh, exist := kv.waitCmdApplyCh[appliedLog.CommandIndex]
 			if !exist {
-				DPrintf("TODO")
+				DPrintf("ApplyDaemon(LEADER:%d commandIndex:%d): waitCmdApplyCh has been closed", kv.me, appliedLog.CommandIndex)
 				kv.mu.Unlock()
 				continue
 			}
-
 			kv.mu.Unlock()
 			*responseCh <- res
 		}
@@ -154,6 +164,8 @@ func (kv *KVServer) ApplyDaemon() {
 func (kv *KVServer) DBExecute(op *OperationArgs) (res OperationReply) {
 	res.Err = OK
 	res.OperationId = op.OperationId
+	res.ClientId = op.ClientId
+	res.Term, _ = kv.rf.GetState()
 	switch op.Type {
 	case GET:
 		if value, exist := kv.db[op.Key]; exist {
@@ -229,5 +241,6 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	kv.waitCmdApplyCh = make(map[int]*chan OperationReply)
 	kv.latestOp = make(map[int64]*OperationReply)
 	go kv.ApplyDaemon()
+
 	return kv
 }

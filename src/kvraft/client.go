@@ -54,22 +54,25 @@ func (ck *Clerk) Get(key string) string {
 		ok := ck.servers[ck.leaderId].Call("KVServer.Get", &args, &reply)
 
 		if !ok {
+			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
 			continue
 		}
 
 		switch reply.Err {
 		case OK:
 			return reply.Value
+		case ErrLeaderOutOfDate:
 		case ErrWrongLeader:
 			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
 			continue
+		case ErrOperationTimeOut:
+			continue
 		case ErrNoKey:
-			return ""
+			return reply.Value
 		}
 	}
 
 	// You will have to modify this function.
-	return ""
 }
 
 // shared by Put and Append.
@@ -95,15 +98,19 @@ func (ck *Clerk) PutAppend(key string, value string, operationType OperationType
 		ok := ck.servers[ck.leaderId].Call("KVServer.PutAppend", &args, &reply)
 
 		if !ok {
+			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
 			continue
 		}
 
 		switch reply.Err {
+		case OK:
+			return
+		case ErrLeaderOutOfDate:
 		case ErrWrongLeader:
 			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
 			continue
-		case OK:
-			return
+		case ErrOperationTimeOut:
+			continue
 		}
 	}
 }
