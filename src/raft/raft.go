@@ -508,7 +508,7 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 
 					DPrintf("sendRequestVote(Candidate:%d Term:%d): becomes LEADER\n", rf.me, rf.currentTerm)
 
-					go rf.heartBeat()
+					rf.heartBeatTimer.Reset(1 * time.Millisecond)
 				}
 			}
 		}
@@ -621,6 +621,7 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		//appends the command to its log as a new entry, then issues
 		//AppendEntries RPCs in parallel to each of the other
 		//servers to replicate the entry.
+		rf.heartBeatTimer.Reset(1 * time.Millisecond)
 	}
 	return index, term, isLeader
 }
@@ -653,8 +654,8 @@ func (rf *Raft) ticker() {
 		case <-rf.electionTimer.C:
 			rf.startElection()
 		case <-rf.heartBeatTimer.C:
-			rf.heartBeat()
 			rf.heartBeatTimer.Reset(HEARTBEAT_INTERVAL)
+			rf.heartBeat()
 		}
 
 		// pause for a random amount of time between 50 and 350
