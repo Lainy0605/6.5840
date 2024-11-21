@@ -156,7 +156,15 @@ func (kv *KVServer) ApplyDaemon() {
 				continue
 			}
 			kv.mu.Unlock()
-			*responseCh <- res
+			func() {
+				defer func() {
+					if recover() != nil {
+						// 如果这里有 panic，是因为通道关闭
+						DPrintf("leader %v ApplyDaemon 发现 ClientId:%v OperationId:%v 的管道不存在, 应该是超时被关闭了", kv.me, operation.ClientId, operation.OperationId)
+					}
+				}()
+				*responseCh <- res
+			}()
 		}
 	}
 }

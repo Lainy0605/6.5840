@@ -820,7 +820,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	//2B
 	rf.applyCh = applyCh
-	rf.applyChTemp = make(chan ApplyMsg, 1000)
+	rf.applyChTemp = make(chan ApplyMsg, 20000)
 	rf.lastApplied = 0
 	rf.log = make([]LogEntry, 0)
 	rf.log = append(rf.log, LogEntry{
