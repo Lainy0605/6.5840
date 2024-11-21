@@ -1,0 +1,1616 @@
+Test (2C): Figure 8 (unreliable) ...
+2024/11/20 14:56:37 startElection(CANDIDATE:3 Term:1): starts election
+2024/11/20 14:56:37 startElection(CANDIDATE:3 Term:1): requests peer 0's vote
+2024/11/20 14:56:37 startElection(CANDIDATE:3 Term:1): requests peer 1's vote
+2024/11/20 14:56:37 startElection(CANDIDATE:3 Term:1): requests peer 2's vote
+2024/11/20 14:56:37 startElection(CANDIDATE:3 Term:1): requests peer 4's vote
+2024/11/20 14:56:37 RequestVoteRPC(Peer:2 CANDIDATE:3 Term:0): gets vote request
+2024/11/20 14:56:37 RequestVoteRPC(Peer:2 CANDIDATE:3 Term:0): becomes FOLLOWER for candidate's term:1 is bigger
+2024/11/20 14:56:37 RequestVoteRPC(Peer:2 CANDIDATE:3 Term:1): votes for candidate
+2024/11/20 14:56:37 sendRequestVote(Candidate:3 Term:1): gets vote from 2
+2024/11/20 14:56:37 RequestVoteRPC(Peer:0 CANDIDATE:3 Term:0): gets vote request
+2024/11/20 14:56:37 RequestVoteRPC(Peer:0 CANDIDATE:3 Term:0): becomes FOLLOWER for candidate's term:1 is bigger
+2024/11/20 14:56:37 RequestVoteRPC(Peer:0 CANDIDATE:3 Term:1): votes for candidate
+2024/11/20 14:56:37 sendRequestVote(Candidate:3 Term:1): gets vote from 0
+2024/11/20 14:56:37 sendRequestVote(Candidate:3 Term:1): becomes LEADER
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 RequestVoteRPC(Peer:4 CANDIDATE:3 Term:0): gets vote request
+2024/11/20 14:56:37 RequestVoteRPC(Peer:4 CANDIDATE:3 Term:0): becomes FOLLOWER for candidate's term:1 is bigger
+2024/11/20 14:56:37 RequestVoteRPC(Peer:4 CANDIDATE:3 Term:1): votes for candidate
+2024/11/20 14:56:37 RequestVoteRPC(Peer:1 CANDIDATE:3 Term:0): gets vote request
+2024/11/20 14:56:37 RequestVoteRPC(Peer:1 CANDIDATE:3 Term:0): becomes FOLLOWER for candidate's term:1 is bigger
+2024/11/20 14:56:37 RequestVoteRPC(Peer:1 CANDIDATE:3 Term:1): votes for candidate
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:2329
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>}], new log: [{0 <nil>} {1 2329}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>}], new log: [{0 <nil>} {1 2329}]
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329}], new log: [{0 <nil>} {1 2329}]
+2024/11/20 14:56:37 sendAppendEntries(LEADER:3 Term: 1): applies message:{true 2329 1 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>}], new log: [{0 <nil>} {1 2329}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>}], new log: [{0 <nil>} {1 2329}]
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:4758
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:2932
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329}], new log: [{0 <nil>} {1 2329} {1 4758}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term: 1): applies message:{true 2329 1 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term: 1): applies message:{true 2329 1 false [] 0 0}
+2024/11/20 14:56:37 sendAppendEntries(LEADER:3 Term: 1): applies message:{true 4758 2 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932}]
+2024/11/20 14:56:37 sendAppendEntries(LEADER:3 Term: 1): applies message:{true 2932 3 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329}], new log: [{0 <nil>} {1 2329} {1 4758}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term: 1): applies message:{true 2329 1 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term: 1): applies message:{true 2329 1 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932}], new log: [{0 <nil>} {1 2329} {1 4758}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932}], new log: [{0 <nil>} {1 2329} {1 4758}]
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term: 1): applies message:{true 4758 2 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:4 LEADER:3 Term: 1): applies message:{true 2932 3 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term: 1): applies message:{true 4758 2 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:0 LEADER:3 Term: 1): applies message:{true 2932 3 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term: 1): applies message:{true 4758 2 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:2 LEADER:3 Term: 1): applies message:{true 2932 3 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): gets heartbeat
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term:1): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932}]
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term: 1): applies message:{true 4758 2 false [] 0 0}
+2024/11/20 14:56:37 AppendEntriesRPC(Peer:1 LEADER:3 Term: 1): applies message:{true 2932 3 false [] 0 0}
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:7791
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:2694
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:5227
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:9080
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:5243
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:6560
+2024/11/20 14:56:37 Start(LEADER:3 Term:1): gets command:569
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:37 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:9143
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:6448
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:879
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 startElection(CANDIDATE:1 Term:2): starts election
+2024/11/20 14:56:38 startElection(CANDIDATE:1 Term:2): requests peer 0's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:1 Term:2): requests peer 2's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:1 Term:2): requests peer 3's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:1 Term:2): requests peer 4's vote
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:6481
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 RequestVoteRPC(Peer:2 CANDIDATE:1 Term:1): gets vote request
+2024/11/20 14:56:38 RequestVoteRPC(Peer:2 CANDIDATE:1 Term:1): becomes FOLLOWER for candidate's term:2 is bigger
+2024/11/20 14:56:38 RequestVoteRPC(Peer:2 CANDIDATE:1 Term:2): votes for candidate
+2024/11/20 14:56:38 sendRequestVote(Candidate:1 Term:2): gets vote from 2
+2024/11/20 14:56:38 RequestVoteRPC(Peer:0 CANDIDATE:1 Term:1): gets vote request
+2024/11/20 14:56:38 RequestVoteRPC(Peer:0 CANDIDATE:1 Term:1): becomes FOLLOWER for candidate's term:2 is bigger
+2024/11/20 14:56:38 RequestVoteRPC(Peer:0 CANDIDATE:1 Term:2): votes for candidate
+2024/11/20 14:56:38 sendRequestVote(Candidate:1 Term:2): gets vote from 0
+2024/11/20 14:56:38 sendRequestVote(Candidate:1 Term:2): becomes LEADER
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:5281
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:6260
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 AppendEntriesRPC(Peer:0 LEADER:1 Term:2): gets heartbeat
+2024/11/20 14:56:38 AppendEntriesRPC(Peer:0 LEADER:1 Term:2): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {2 5281}]
+2024/11/20 14:56:38 AppendEntriesRPC(Peer:4 LEADER:1 Term:2): gets heartbeat
+2024/11/20 14:56:38 AppendEntriesRPC(Peer:4 LEADER:1 Term:2): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {2 5281}]
+2024/11/20 14:56:38 AppendEntriesRPC(Peer:0 LEADER:1 Term:2): gets heartbeat
+2024/11/20 14:56:38 sendAppendEntries(LEADER:1 Term: 2): applies message:{true 5281 4 false [] 0 0}
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:5521
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:7967
+2024/11/20 14:56:38 AppendEntriesRPC(Peer:4 LEADER:1 Term:2): gets heartbeat
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:8372
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:46
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:1 Term:2): gets vote request
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:5126
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:6831
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:2426
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:2674
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 AppendEntriesRPC(Peer:2 LEADER:1 Term:2): gets heartbeat
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:9875
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:8180
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:4698
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:3322
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:1663
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:7053
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:8462
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:3620
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:3): starts election
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:3): requests peer 0's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:3): requests peer 1's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:3): requests peer 3's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:3): requests peer 4's vote
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:4403
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:4310
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:1225
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:2538
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:2): gets vote request
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:2): becomes FOLLOWER for candidate's term:3 is bigger
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:3): votes for candidate
+2024/11/20 14:56:38 sendRequestVote(Candidate:2 Term:3): gets vote from 4
+2024/11/20 14:56:38 startElection(CANDIDATE:0 Term:3): starts election
+2024/11/20 14:56:38 startElection(CANDIDATE:0 Term:3): requests peer 1's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:0 Term:3): requests peer 2's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:0 Term:3): requests peer 3's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:0 Term:3): requests peer 4's vote
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:2784
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:4442
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:3): gets vote request
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:3): gets vote request
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:4): starts election
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:4): requests peer 0's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:4): requests peer 1's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:4): requests peer 3's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:4): requests peer 4's vote
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:3): gets vote request
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:3): becomes FOLLOWER for candidate's term:4 is bigger
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:4): votes for candidate
+2024/11/20 14:56:38 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:3): gets vote request
+2024/11/20 14:56:38 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:3): becomes FOLLOWER for candidate's term:4 is bigger
+2024/11/20 14:56:38 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:4): votes for candidate
+2024/11/20 14:56:38 sendRequestVote(Candidate:2 Term:4): gets vote from 0
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:8993
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:8127
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:2621
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:9100
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:1327
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:4700
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:6995
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:2414
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:4396
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:8948
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:7307
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:1669
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Start(LEADER:1 Term:2): gets command:4356
+2024/11/20 14:56:38 Start(LEADER:3 Term:1): gets command:2227
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:38 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:38 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:5): starts election
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:5): requests peer 0's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:5): requests peer 1's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:5): requests peer 3's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:2 Term:5): requests peer 4's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:4 Term:5): starts election
+2024/11/20 14:56:38 startElection(CANDIDATE:4 Term:5): requests peer 0's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:4 Term:5): requests peer 1's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:4 Term:5): requests peer 2's vote
+2024/11/20 14:56:38 startElection(CANDIDATE:4 Term:5): requests peer 3's vote
+2024/11/20 14:56:38 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:5): gets vote request
+2024/11/20 14:56:39 RequestVoteRPC(Peer:0 CANDIDATE:4 Term:4): gets vote request
+2024/11/20 14:56:39 RequestVoteRPC(Peer:0 CANDIDATE:4 Term:4): becomes FOLLOWER for candidate's term:5 is bigger
+2024/11/20 14:56:39 RequestVoteRPC(Peer:0 CANDIDATE:4 Term:5): votes for candidate
+2024/11/20 14:56:39 sendRequestVote(Candidate:4 Term:5): gets vote from 0
+2024/11/20 14:56:39 RequestVoteRPC(Peer:2 CANDIDATE:4 Term:5): gets vote request
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:7795
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:7209
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:6896
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:3242
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 startElection(CANDIDATE:0 Term:6): starts election
+2024/11/20 14:56:39 startElection(CANDIDATE:0 Term:6): requests peer 1's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:0 Term:6): requests peer 2's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:0 Term:6): requests peer 3's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:0 Term:6): requests peer 4's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:6): starts election
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:6): requests peer 0's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:6): requests peer 1's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:6): requests peer 3's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:6): requests peer 4's vote
+2024/11/20 14:56:39 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:6): gets vote request
+2024/11/20 14:56:39 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:5): gets vote request
+2024/11/20 14:56:39 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:5): becomes FOLLOWER for candidate's term:6 is bigger
+2024/11/20 14:56:39 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:6): votes for candidate
+2024/11/20 14:56:39 sendRequestVote(Candidate:0 Term:6): gets vote from 4
+2024/11/20 14:56:39 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:6): gets vote request
+2024/11/20 14:56:39 RequestVoteRPC(Peer:2 CANDIDATE:0 Term:6): gets vote request
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:6829
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:3132
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:7947
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:7394
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:9884
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:260
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:3662
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:2534
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:5815
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:476
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:7503
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:7222
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:4087
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:6097
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:5236
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:870
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:8870
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:5897
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:5945
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:2631
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:476
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:2004
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:917
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:5754
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:4936
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:8811
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:8434
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:6687
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:1757
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:8025
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:7): starts election
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:7): requests peer 0's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:7): requests peer 1's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:7): requests peer 3's vote
+2024/11/20 14:56:39 startElection(CANDIDATE:2 Term:7): requests peer 4's vote
+2024/11/20 14:56:39 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:6): gets vote request
+2024/11/20 14:56:39 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:6): becomes FOLLOWER for candidate's term:7 is bigger
+2024/11/20 14:56:39 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:6): gets vote request
+2024/11/20 14:56:39 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:6): becomes FOLLOWER for candidate's term:7 is bigger
+2024/11/20 14:56:39 RequestVoteRPC(Peer:0 CANDIDATE:2 Term:7): votes for candidate
+2024/11/20 14:56:39 RequestVoteRPC(Peer:4 CANDIDATE:2 Term:7): votes for candidate
+2024/11/20 14:56:39 sendRequestVote(Candidate:2 Term:7): gets vote from 4
+2024/11/20 14:56:39 sendRequestVote(Candidate:2 Term:7): gets vote from 0
+2024/11/20 14:56:39 sendRequestVote(Candidate:2 Term:7): becomes LEADER
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:4 LEADER:2 Term:7): gets heartbeat
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:0 LEADER:2 Term:7): gets heartbeat
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:4 LEADER:2 Term:7): gets heartbeat
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:0 LEADER:2 Term:7): gets heartbeat
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:4 LEADER:2 Term:7): gets heartbeat
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:7570
+2024/11/20 14:56:39 Start(LEADER:2 Term:7): gets command:2124
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:9378
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:0 LEADER:2 Term:7): gets heartbeat
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:0 LEADER:2 Term:7): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124}]
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:344
+2024/11/20 14:56:39 Start(LEADER:2 Term:7): gets command:2952
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:1137
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:4 LEADER:2 Term:7): gets heartbeat
+2024/11/20 14:56:39 AppendEntriesRPC(Peer:4 LEADER:2 Term:7): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124}]
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:9993
+2024/11/20 14:56:39 Start(LEADER:2 Term:7): gets command:4568
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:3936
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:4648
+2024/11/20 14:56:39 Start(LEADER:2 Term:7): gets command:7104
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:4479
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Start(LEADER:1 Term:2): gets command:7667
+2024/11/20 14:56:39 Start(LEADER:2 Term:7): gets command:2701
+2024/11/20 14:56:39 Start(LEADER:3 Term:1): gets command:4556
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:39 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:39 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:8): starts election
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:8): requests peer 1's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:8): requests peer 2's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:8): requests peer 3's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:8): requests peer 4's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:8): starts election
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:8): requests peer 0's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:8): requests peer 1's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:8): requests peer 2's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:8): requests peer 3's vote
+2024/11/20 14:56:40 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:8): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:0 CANDIDATE:4 Term:8): gets vote request
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:1 Term:2): gets command:974
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:9972
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:9351
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:1 Term:2): gets command:8393
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3442
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1574
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:1 Term:2): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:0 LEADER:1 Term:8): returns false for leader's term:2 is smaller
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:9180
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:2414
+2024/11/20 14:56:40 startElection(CANDIDATE:1 Term:9): starts election
+2024/11/20 14:56:40 startElection(CANDIDATE:1 Term:9): requests peer 0's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:1 Term:9): requests peer 2's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:1 Term:9): requests peer 3's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:1 Term:9): requests peer 4's vote
+2024/11/20 14:56:40 RequestVoteRPC(Peer:0 CANDIDATE:1 Term:8): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:0 CANDIDATE:1 Term:8): becomes FOLLOWER for candidate's term:9 is bigger
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:1 Term:8): returns false for leader's term:2 is smaller
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 old AppendEntries RPC
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:4004
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8371
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:1 Term:8): returns false for leader's term:2 is smaller
+2024/11/20 14:56:40 old AppendEntries RPC
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 RequestVoteRPC(Peer:4 CANDIDATE:1 Term:8): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:4 CANDIDATE:1 Term:8): becomes FOLLOWER for candidate's term:9 is bigger
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:6219
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8796
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:0 LEADER:1 Term:9): returns false for leader's term:2 is smaller
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7766
+2024/11/20 14:56:40 old AppendEntries RPC
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8207
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:6606
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:3019
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:2936
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:3257
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:2933
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:614
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3429
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5649
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:4939
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:9633
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7029
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1081
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8071
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:4595
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:2323
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:2599
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3236
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5685
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:6493
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5025
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:10): starts election
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:10): requests peer 0's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:10): requests peer 1's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:10): requests peer 2's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:10): requests peer 3's vote
+2024/11/20 14:56:40 RequestVoteRPC(Peer:0 CANDIDATE:4 Term:9): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:0 CANDIDATE:4 Term:9): becomes FOLLOWER for candidate's term:10 is bigger
+2024/11/20 14:56:40 RequestVoteRPC(Peer:0 CANDIDATE:4 Term:10): votes for candidate
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:6321
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:2357
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:4 Term:9): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:4 Term:9): becomes FOLLOWER for candidate's term:10 is bigger
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:4 Term:10): votes for candidate
+2024/11/20 14:56:40 sendRequestVote(Candidate:4 Term:10): gets vote from 1
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7272
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8915
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7836
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:9085
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3302
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1273
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:4811
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:4737
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:4461
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1845
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3058
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:4160
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8720
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:80
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:9142
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5443
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8603
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:4272
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8737
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:7853
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8582
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5217
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:6838
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5713
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7596
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:7431
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:6569
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:9501
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:585
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8088
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7727
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1083
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8803
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:881
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:103
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:209
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7403
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:820
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3455
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:2664
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:2654
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1575
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:5854
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1901
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:5095
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:7475
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3333
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:4708
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:728
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8275
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:9697
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:2541
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:5868
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:453
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3281
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:6853
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:9477
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:4823
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:1180
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8940
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7745
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1318
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:2511
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5044
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:586
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:1649
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:532
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:6493
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3904
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:6080
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8599
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8608
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:9501
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:8585
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:5881
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:3822
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:2576
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5416
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:9782
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:11): starts election
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:11): requests peer 1's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:11): requests peer 2's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:11): requests peer 3's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:0 Term:11): requests peer 4's vote
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:7354
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:1648
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5386
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7193
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:9045
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:10): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:10): becomes FOLLOWER for candidate's term:11 is bigger
+2024/11/20 14:56:40 RequestVoteRPC(Peer:4 CANDIDATE:0 Term:11): votes for candidate
+2024/11/20 14:56:40 sendRequestVote(Candidate:0 Term:11): gets vote from 4
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:0 Term:10): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:0 Term:10): becomes FOLLOWER for candidate's term:11 is bigger
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:0 Term:11): votes for candidate
+2024/11/20 14:56:40 sendRequestVote(Candidate:0 Term:11): gets vote from 1
+2024/11/20 14:56:40 sendRequestVote(Candidate:0 Term:11): becomes LEADER
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:8410
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:3703
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:2735
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:4138
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:8889
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:785
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:1830
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:1226
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:9298
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:0 Term:11): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:0 Term:11): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:0 Term:11): returns false for log mismatching, follower's log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {2 5281} {2 5521} {2 8372} {2 5126} {2 2426} {2 9875} {2 4698} {2 1663} {2 8462} {2 4403} {2 1225} {2 2784} {2 8993} {2 2621} {2 1327} {2 6995} {2 4396} {2 7307} {2 4356} {2 7795} {2 6896} {2 6829} {2 7947} {2 9884} {2 3662} {2 5815} {2 7503} {2 4087} {2 5236} {2 8870} {2 5945} {2 476} {2 917} {2 4936} {2 8434} {2 1757} {2 7570} {2 344} {2 9993} {2 4648} {2 7667} {2 974} {2 8393}], leaders's prevLogTerm 7
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:0 Term:11): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:0 Term:11): returns false for log mismatching, follower's log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {2 5281} {2 5521} {2 8372} {2 5126} {2 2426} {2 9875} {2 4698} {2 1663} {2 8462} {2 4403} {2 1225} {2 2784} {2 8993} {2 2621} {2 1327} {2 6995} {2 4396} {2 7307} {2 4356} {2 7795} {2 6896} {2 6829} {2 7947} {2 9884} {2 3662} {2 5815} {2 7503} {2 4087} {2 5236} {2 8870} {2 5945} {2 476} {2 917} {2 4936} {2 8434} {2 1757} {2 7570} {2 344} {2 9993} {2 4648} {2 7667} {2 974} {2 8393}], leaders's prevLogTerm 7
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:6270
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:7301
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:5537
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:8660
+2024/11/20 14:56:40 Start(LEADER:2 Term:7): gets command:974
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:2823
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:2 Term:7): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:2 Term:11): returns false for leader's term:7 is smaller
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:0 Term:11): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:0 Term:11): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124} {11 8410}]
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:2 Term:11): returns false for leader's term:7 is smaller
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:2 Term:11): returns false for leader's term:7 is smaller
+2024/11/20 14:56:40 old AppendEntries RPC
+2024/11/20 14:56:40 old AppendEntries RPC
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:2 Term:11): returns false for leader's term:7 is smaller
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:12): starts election
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:12): requests peer 0's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:12): requests peer 1's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:12): requests peer 2's vote
+2024/11/20 14:56:40 startElection(CANDIDATE:4 Term:12): requests peer 3's vote
+2024/11/20 14:56:40 RequestVoteRPC(Peer:2 CANDIDATE:4 Term:11): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:2 CANDIDATE:4 Term:11): becomes FOLLOWER for candidate's term:12 is bigger
+2024/11/20 14:56:40 RequestVoteRPC(Peer:2 CANDIDATE:4 Term:12): votes for candidate
+2024/11/20 14:56:40 sendRequestVote(Candidate:4 Term:12): gets vote from 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:4 Term:11): gets vote request
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:4 Term:11): becomes FOLLOWER for candidate's term:12 is bigger
+2024/11/20 14:56:40 RequestVoteRPC(Peer:1 CANDIDATE:4 Term:12): votes for candidate
+2024/11/20 14:56:40 sendRequestVote(Candidate:4 Term:12): gets vote from 1
+2024/11/20 14:56:40 sendRequestVote(Candidate:4 Term:12): becomes LEADER
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): returns false for log mismatching, follower's log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {2 5281} {2 5521} {2 8372} {2 5126} {2 2426} {2 9875} {2 4698} {2 1663} {2 8462} {2 4403} {2 1225} {2 2784} {2 8993} {2 2621} {2 1327} {2 6995} {2 4396} {2 7307} {2 4356} {2 7795} {2 6896} {2 6829} {2 7947} {2 9884} {2 3662} {2 5815} {2 7503} {2 4087} {2 5236} {2 8870} {2 5945} {2 476} {2 917} {2 4936} {2 8434} {2 1757} {2 7570} {2 344} {2 9993} {2 4648} {2 7667} {2 974} {2 8393}], leaders's prevLogTerm 11
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:2 LEADER:4 Term:12): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:2 LEADER:4 Term:12): returns false for log mismatching, follower's log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124} {7 2952} {7 4568} {7 7104} {7 2701} {7 9972} {7 3442} {7 9180} {7 4004} {7 6219} {7 7766} {7 6606} {7 2936} {7 2933} {7 3429} {7 4939} {7 7029} {7 8071} {7 2323} {7 3236} {7 6493} {7 6321} {7 7272} {7 7836} {7 3302} {7 4811} {7 4461} {7 3058} {7 8720} {7 9142} {7 8603} {7 8737} {7 8582} {7 6838} {7 7596} {7 6569} {7 585} {7 7727} {7 8803} {7 103} {7 7403} {7 3455} {7 2654} {7 5854} {7 5095} {7 3333} {7 728} {7 9697} {7 5868} {7 3281} {7 9477} {7 1180} {7 7745} {7 2511} {7 586} {7 532} {7 3904} {7 8599} {7 9501} {7 5881} {7 2576} {7 9782} {7 1648} {7 7193} {7 3703} {7 8889} {7 1226} {7 7301} {7 974}], leaders's prevLogTerm 11
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): returns false for log mismatching, follower's log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {2 5281} {2 5521} {2 8372} {2 5126} {2 2426} {2 9875} {2 4698} {2 1663} {2 8462} {2 4403} {2 1225} {2 2784} {2 8993} {2 2621} {2 1327} {2 6995} {2 4396} {2 7307} {2 4356} {2 7795} {2 6896} {2 6829} {2 7947} {2 9884} {2 3662} {2 5815} {2 7503} {2 4087} {2 5236} {2 8870} {2 5945} {2 476} {2 917} {2 4936} {2 8434} {2 1757} {2 7570} {2 344} {2 9993} {2 4648} {2 7667} {2 974} {2 8393}], leaders's prevLogTerm 11
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:542
+2024/11/20 14:56:40 Start(LEADER:3 Term:1): gets command:9984
+2024/11/20 14:56:40 Start(LEADER:4 Term:12): gets command:6695
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:3 Term:1): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:4 LEADER:3 Term:12): returns false for leader's term:1 is smaller
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:3 LEADER:4 Term:12): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:3 LEADER:4 Term:12): returns false for log mismatching, follower's log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {1 7791} {1 2694} {1 5227} {1 9080} {1 5243} {1 6560} {1 569} {1 9143} {1 6448} {1 879} {1 6481} {1 6260} {1 7967} {1 46} {1 6831} {1 2674} {1 8180} {1 3322} {1 7053} {1 3620} {1 4310} {1 2538} {1 4442} {1 8127} {1 9100} {1 4700} {1 2414} {1 8948} {1 1669} {1 2227} {1 7209} {1 3242} {1 3132} {1 7394} {1 260} {1 2534} {1 476} {1 7222} {1 6097} {1 870} {1 5897} {1 2631} {1 2004} {1 5754} {1 8811} {1 6687} {1 8025} {1 9378} {1 1137} {1 3936} {1 4479} {1 4556} {1 9351} {1 1574} {1 2414} {1 8371} {1 8796} {1 8207} {1 3019} {1 3257} {1 614} {1 5649} {1 9633} {1 1081} {1 4595} {1 2599} {1 5685} {1 5025} {1 2357} {1 8915} {1 9085} {1 1273} {1 4737} {1 1845} {1 4160} {1 80} {1 5443} {1 4272} {1 7853} {1 5217} {1 5713} {1 7431} {1 9501} {1 8088} {1 1083} {1 881} {1 209} {1 820} {1 2664} {1 1575} {1 1901} {1 7475} {1 4708} {1 8275} {1 2541} {1 453} {1 6853} {1 4823} {1 8940} {1 1318} {1 5044} {1 1649} {1 6493} {1 6080} {1 8608} {1 8585} {1 3822} {1 5416} {1 7354} {1 5386} {1 9045} {1 2735} {1 785} {1 9298} {1 5537} {1 2823} {1 9984}], leaders's prevLogTerm 11
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:3890
+2024/11/20 14:56:40 Start(LEADER:4 Term:12): gets command:9837
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:3 Term:12): returns false for leader's term:1 is smaller
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 old AppendEntries RPC
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {2 5281} {2 5521} {2 8372} {2 5126} {2 2426} {2 9875} {2 4698} {2 1663} {2 8462} {2 4403} {2 1225} {2 2784} {2 8993} {2 2621} {2 1327} {2 6995} {2 4396} {2 7307} {2 4356} {2 7795} {2 6896} {2 6829} {2 7947} {2 9884} {2 3662} {2 5815} {2 7503} {2 4087} {2 5236} {2 8870} {2 5945} {2 476} {2 917} {2 4936} {2 8434} {2 1757} {2 7570} {2 344} {2 9993} {2 4648} {2 7667} {2 974} {2 8393}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124} {11 8410} {12 6695}]
+2024/11/20 14:56:40 Start(LEADER:0 Term:11): gets command:7001
+2024/11/20 14:56:40 Start(LEADER:4 Term:12): gets command:4280
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 0
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:4 Term:12): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 1
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 2
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 3
+2024/11/20 14:56:40 Heartbeat(LEADER:0 Term:11): send AppendEntriesRPC to peer 4
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:3 LEADER:4 Term:12): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:3 LEADER:4 Term:12): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {1 7791} {1 2694} {1 5227} {1 9080} {1 5243} {1 6560} {1 569} {1 9143} {1 6448} {1 879} {1 6481} {1 6260} {1 7967} {1 46} {1 6831} {1 2674} {1 8180} {1 3322} {1 7053} {1 3620} {1 4310} {1 2538} {1 4442} {1 8127} {1 9100} {1 4700} {1 2414} {1 8948} {1 1669} {1 2227} {1 7209} {1 3242} {1 3132} {1 7394} {1 260} {1 2534} {1 476} {1 7222} {1 6097} {1 870} {1 5897} {1 2631} {1 2004} {1 5754} {1 8811} {1 6687} {1 8025} {1 9378} {1 1137} {1 3936} {1 4479} {1 4556} {1 9351} {1 1574} {1 2414} {1 8371} {1 8796} {1 8207} {1 3019} {1 3257} {1 614} {1 5649} {1 9633} {1 1081} {1 4595} {1 2599} {1 5685} {1 5025} {1 2357} {1 8915} {1 9085} {1 1273} {1 4737} {1 1845} {1 4160} {1 80} {1 5443} {1 4272} {1 7853} {1 5217} {1 5713} {1 7431} {1 9501} {1 8088} {1 1083} {1 881} {1 209} {1 820} {1 2664} {1 1575} {1 1901} {1 7475} {1 4708} {1 8275} {1 2541} {1 453} {1 6853} {1 4823} {1 8940} {1 1318} {1 5044} {1 1649} {1 6493} {1 6080} {1 8608} {1 8585} {1 3822} {1 5416} {1 7354} {1 5386} {1 9045} {1 2735} {1 785} {1 9298} {1 5537} {1 2823} {1 9984}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124} {11 8410} {12 6695} {12 9837} {12 4280}]
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): gets heartbeat
+2024/11/20 14:56:40 AppendEntriesRPC(Peer:1 LEADER:4 Term:12): replicate log entries, old log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124} {11 8410} {12 6695}], new log: [{0 <nil>} {1 2329} {1 4758} {1 2932} {7 2124} {11 8410} {12 6695} {12 9837} {12 4280}]
+2024/11/20 14:56:40 sendAppendEntries(LEADER:4 Term: 12): applies message:{true 2124 4 false [] 0 0}
+2024/11/20 14:56:40 sendAppendEntries(LEADER:4 Term: 12): applies message:{true 8410 5 false [] 0 0}
+2024/11/20 14:56:40 sendAppendEntries(LEADER:4 Term: 12): applies message:{true 6695 6 false [] 0 0}
+2024/11/20 14:56:40 sendAppendEntries(LEADER:4 Term: 12): applies message:{true 9837 7 false [] 0 0}
+2024/11/20 14:56:40 sendAppendEntries(LEADER:4 Term: 12): applies message:{true 4280 8 false [] 0 0}
+2024/11/20 14:56:40 4: log map[1:2329 2:4758 3:2932]; server map[1:2329 2:4758 3:2932 4:5281]
+2024/11/20 14:56:40 apply error: commit index=4 server=4 2124 != server=1 5281
+exit status 1
+FAIL	6.5840/raft	9.367s
