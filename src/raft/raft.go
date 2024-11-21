@@ -380,22 +380,36 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	if args.PrevLogIndex > rf.getLastLogIndex() {
 		reply.XIndex = rf.getLastLogIndex() + 1
 		reply.XTerm = rf.getLastLogTerm()
-		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): returns false for log missing, follower's log: %v, leader's prevLogIndex %d\n", rf.me, args.LeaderId, rf.currentTerm, rf.log, args.PrevLogIndex)
+		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): log missing, follower's lastLogIndex: %d, leader's prevLogIndex: %d\n", rf.me, args.LeaderId, rf.currentTerm, rf.getLastLogIndex(), args.PrevLogIndex)
+		return
+	} else if args.PrevLogIndex < rf.lastIncludedIndex {
+		reply.XIndex = rf.lastIncludedIndex + 1
+		reply.XTerm = rf.lastIncludedTerm
+		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): log snapshoted, follower's lastIncludedIndex: %d, leader's prevLogIndex: %d\n", rf.me, args.LeaderId, rf.currentTerm, rf.lastIncludedIndex, args.PrevLogIndex)
 		return
 	} else if rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term != args.PrevLogTerm {
 		reply.XTerm = rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term
 		reply.XIndex = rf.findFirstIndexOfTerm(reply.XTerm)
-		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): returns false for log mismatching, follower's log: %v, leaders's prevLogTerm %d\n", rf.me, args.LeaderId, rf.currentTerm, rf.log, args.PrevLogTerm)
+		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): log mismatching, follower's term in prevLogIndex: %d, leaders's prevLogTerm: %d\n", rf.me, args.LeaderId, rf.currentTerm, rf.log[rf.getRelativeLogIndex(args.PrevLogIndex)].Term, args.PrevLogTerm)
 		return
 	}
 
 	reply.Success = true
-	//rf.log = rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)] //[:index)
 	oldLog := append([]LogEntry(nil), rf.log[:]...)
-	rf.log = append([]LogEntry(nil), rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)]...)
+	//rf.log = append([]LogEntry(nil), rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)]...)
 	if args.Entries != nil {
-		for _, entry := range args.Entries {
-			rf.log = append(rf.log, entry)
+		for idx, entry := range args.Entries {
+			ridx := rf.getRelativeLogIndex(args.PrevLogIndex) + 1 + idx
+			if ridx < len(rf.log) && rf.log[ridx].Term != entry.Term {
+				// 某位置发生了冲突, 覆盖这个位置开始的所有内容
+				rf.log = append([]LogEntry(nil), rf.log[:ridx]...)
+				rf.log = append(rf.log, args.Entries[idx:]...)
+				break
+			} else if ridx >= len(rf.log) {
+				// 没有发生冲突但长度更长了, 直接拼接
+				rf.log = append(rf.log, args.Entries[idx:]...)
+				break
+			}
 		}
 		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): replicate log entries, old log: %v, new log: %v\n", rf.me, args.LeaderId, rf.currentTerm, oldLog, rf.log)
 	}
@@ -440,9 +454,9 @@ func (rf *Raft) sendInstallSnapshot(server int, args *InstallSnapshotArgs, reply
 			rf.state = FOLLOWER
 			rf.votedFor = -1
 			rf.persist()
-		} else if args.Term != rf.currentTerm {
+		} else if args.Term != rf.currentTerm || rf.state != LEADER {
 			DPrintf("old AppendEntries RPC")
-		} else if rf.state == LEADER {
+		} else {
 			rf.nextIndex[server] = args.LastIncludedIndex + 1
 			rf.matchIndex[server] = args.LastIncludedIndex
 		}
@@ -489,27 +503,25 @@ func (rf *Raft) sendRequestVote(server int, args *RequestVoteArgs, reply *Reques
 			rf.state = FOLLOWER
 			rf.votedFor = -1
 			rf.persist()
-		} else if args.Term != rf.currentTerm {
-			DPrintf("old AppendEntries RPC")
-		} else if rf.state == CANDIDATE { //maybe it has become FOLLOWER or LEADER, do not accept remaining votes
-			if reply.VoteGranted && args.Term == rf.currentTerm { //maybe get in next term
-				DPrintf("sendRequestVote(Candidate:%d Term:%d): gets vote from %d\n", rf.me, rf.currentTerm, server)
+		} else if args.Term != rf.currentTerm || rf.state != CANDIDATE { //maybe it has become FOLLOWER or LEADER, do not accept remaining votes
+			DPrintf("old AppendEntries RPC") //maybe get in next term
+		} else if reply.VoteGranted {
+			DPrintf("sendRequestVote(Candidate:%d Term:%d): gets vote from %d\n", rf.me, rf.currentTerm, server)
 
-				rf.voteCount++
-				if rf.voteCount > len(rf.peers)/2 {
-					rf.state = LEADER
-					rf.nextIndex = make([]int, len(rf.peers))
-					rf.matchIndex = make([]int, len(rf.peers))
+			rf.voteCount++
+			if rf.voteCount > len(rf.peers)/2 {
+				rf.state = LEADER
+				rf.nextIndex = make([]int, len(rf.peers))
+				rf.matchIndex = make([]int, len(rf.peers))
 
-					for i := 0; i < len(rf.peers); i++ {
-						rf.nextIndex[i] = rf.getLastLogIndex() + 1
-						rf.matchIndex[i] = rf.getLastLogIndex()
-					}
-
-					DPrintf("sendRequestVote(Candidate:%d Term:%d): becomes LEADER\n", rf.me, rf.currentTerm)
-
-					rf.heartBeatTimer.Reset(1 * time.Millisecond)
+				for i := 0; i < len(rf.peers); i++ {
+					rf.nextIndex[i] = rf.getLastLogIndex() + 1
+					rf.matchIndex[i] = rf.getLastLogIndex()
 				}
+
+				DPrintf("sendRequestVote(Candidate:%d Term:%d): becomes LEADER\n", rf.me, rf.currentTerm)
+
+				rf.heartBeatTimer.Reset(1 * time.Millisecond)
 			}
 		}
 	}
@@ -520,7 +532,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
 
 	//for !ok { //If followers crash or run slowly, or if network packets are lost, the leader retries AppendEntries RPCs indefinitely
-	//	if rf.killed() || rf.state != LEADER {
+	//	if rf.killed() || rf.state != LEADER || rf.currentTerm != args.Term {
 	//		return false
 	//}
 	//	ok = rf.peers[server].Call("Raft.AppendEntries", args, reply)
