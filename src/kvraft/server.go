@@ -4,13 +4,14 @@ import (
 	"6.5840/labgob"
 	"6.5840/labrpc"
 	"6.5840/raft"
+	"bytes"
 	"log"
 	"sync"
 	"sync/atomic"
 	"time"
 )
 
-const Debug = false
+const Debug = true
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug {
@@ -50,9 +51,10 @@ type KVServer struct {
 	maxraftstate int // snapshot if log grows this big
 
 	// Your definitions here.
-	db             map[string]string
-	waitCmdApplyCh map[int]*chan OperationReply
-	latestOp       map[int64]*OperationReply
+	db                map[string]string
+	waitCmdApplyCh    map[int]*chan OperationReply
+	latestOp          map[int64]*OperationReply
+	lastIncludedIndex int
 }
 
 func (kv *KVServer) Get(args *GetArgs, reply *GetReply) {
@@ -132,6 +134,11 @@ func (kv *KVServer) ApplyDaemon() {
 	for !kv.killed() {
 		appliedLog := <-kv.applyCh
 		if appliedLog.CommandValid {
+			if appliedLog.CommandIndex <= kv.lastIncludedIndex { //command has been snapshot
+				DPrintf("213213214\n")
+				continue
+			}
+
 			operation := appliedLog.Command.(OperationArgs)
 			var res OperationReply
 			needApply := true
@@ -146,6 +153,12 @@ func (kv *KVServer) ApplyDaemon() {
 			if needApply {
 				res = kv.DBExecute(&operation)
 				kv.latestOp[operation.ClientId] = &res
+			}
+
+			if kv.maxraftstate != -1 && kv.rf.RaftStateSize() >= kv.maxraftstate {
+				DPrintf("ApplyDaemon(Peer:%d commandIndex:%d): KVServer calls snapshot", kv.me, appliedLog.CommandIndex)
+				snapshot := kv.PersistSnapshot()
+				kv.rf.Snapshot(appliedLog.CommandIndex, snapshot)
 			}
 
 			_, isLeader := kv.rf.GetState()
@@ -165,11 +178,19 @@ func (kv *KVServer) ApplyDaemon() {
 				defer func() {
 					if recover() != nil {
 						// 如果这里有 panic，是因为通道关闭
-						DPrintf("leader %v ApplyDaemon 发现 ClientId:%v OperationId:%v 的管道不存在, 应该是超时被关闭了", kv.me, operation.ClientId, operation.OperationId)
+						DPrintf("ApplyDaemon(LEADER:%d commandIndex:%d): waitCmdApplyCh has been closed", kv.me, appliedLog.CommandIndex)
 					}
 				}()
 				*responseCh <- res
 			}()
+		} else if appliedLog.SnapshotValid {
+			kv.mu.Lock()
+			if appliedLog.SnapshotIndex >= kv.lastIncludedIndex {
+				DPrintf("ApplyDaemon(Peer:%d SnapshotIndex:%d): KVServer gets snapshot", kv.me, appliedLog.SnapshotIndex)
+				kv.ReadSnapshot(appliedLog.Snapshot)
+				kv.lastIncludedIndex = appliedLog.SnapshotIndex
+			}
+			kv.mu.Unlock()
 		}
 	}
 }
@@ -201,6 +222,38 @@ func (kv *KVServer) DBExecute(op *OperationArgs) (res OperationReply) {
 	}
 
 	return
+}
+
+func (kv *KVServer) PersistSnapshot() []byte {
+	// 调用时必须持有锁mu
+	w := new(bytes.Buffer)
+	e := labgob.NewEncoder(w)
+	if e.Encode(kv.db) != nil ||
+		e.Encode(kv.latestOp) != nil {
+		log.Fatal("KVServer encode error")
+	}
+
+	KVServerState := w.Bytes()
+	return KVServerState
+}
+
+func (kv *KVServer) ReadSnapshot(data []byte) {
+	// 调用时必须持有锁mu
+	if data == nil || len(data) < 1 { // bootstrap without any state?
+		return
+	}
+	r := bytes.NewBuffer(data)
+	d := labgob.NewDecoder(r)
+	var db map[string]string
+	var latestOp map[int64]*OperationReply
+
+	if d.Decode(&db) != nil ||
+		d.Decode(&latestOp) != nil {
+		log.Fatal("KVServer decode error")
+	} else {
+		kv.db = db
+		kv.latestOp = latestOp
+	}
 }
 
 // the tester calls Kill() when a KVServer instance won't
@@ -252,6 +305,11 @@ func StartKVServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persiste
 	kv.db = make(map[string]string)
 	kv.waitCmdApplyCh = make(map[int]*chan OperationReply)
 	kv.latestOp = make(map[int64]*OperationReply)
+	kv.lastIncludedIndex = -1
+
+	// initialize from state persisted before a crash
+	kv.ReadSnapshot(persister.ReadSnapshot())
+
 	go kv.ApplyDaemon()
 
 	return kv
