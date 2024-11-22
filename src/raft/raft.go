@@ -395,7 +395,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 	}
 
 	reply.Success = true
-	oldLog := append([]LogEntry(nil), rf.log[:]...)
+	//oldLog := append([]LogEntry(nil), rf.log[:]...)
 	//rf.log = append([]LogEntry(nil), rf.log[:rf.getRelativeLogIndex(args.PrevLogIndex+1)]...)
 	if args.Entries != nil {
 		for idx, entry := range args.Entries {
@@ -411,7 +411,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 				break
 			}
 		}
-		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): replicate log entries, old log: %v, new log: %v\n", rf.me, args.LeaderId, rf.currentTerm, oldLog, rf.log)
+		DPrintf("AppendEntriesRPC(Peer:%d LEADER:%d Term:%d): replicate log entries:%v\n", rf.me, args.LeaderId, rf.currentTerm, args.Entries)
 	}
 	rf.persist()
 
@@ -833,7 +833,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	//2B
 	rf.applyCh = applyCh
-	rf.applyChTemp = make(chan ApplyMsg, 1000)
+	rf.applyChTemp = make(chan ApplyMsg, 20000)
 	rf.lastApplied = 0
 	rf.log = make([]LogEntry, 0)
 	rf.log = append(rf.log, LogEntry{
