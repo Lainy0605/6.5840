@@ -62,6 +62,8 @@ func (ck *Clerk) Get(key string) string {
 		case OK:
 			return reply.Value
 		case ErrLeaderOutOfDate:
+			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
+			continue
 		case ErrWrongLeader:
 			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
 			continue
@@ -106,6 +108,8 @@ func (ck *Clerk) PutAppend(key string, value string, operationType OperationType
 		case OK:
 			return
 		case ErrLeaderOutOfDate:
+			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
+			continue
 		case ErrWrongLeader:
 			ck.leaderId = (ck.leaderId + 1) % len(ck.servers)
 			continue

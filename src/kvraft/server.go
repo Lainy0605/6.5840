@@ -85,10 +85,11 @@ func (kv *KVServer) PutAppend(args *PutAppendArgs, reply *PutAppendReply) {
 }
 
 func (kv *KVServer) handleOperation(operationArgs OperationArgs) (reply OperationReply) {
-	index, term, isLeader := kv.rf.Start(operationArgs)
+	index, _, isLeader := kv.rf.Start(operationArgs)
 
 	if !isLeader {
 		reply.Err = ErrWrongLeader
+		DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): ErrWrongLeader\n", kv.me, operationArgs.ClientId, operationArgs.OperationId)
 		return
 	}
 
@@ -108,16 +109,20 @@ func (kv *KVServer) handleOperation(operationArgs OperationArgs) (reply Operatio
 	select {
 	case msg, success := <-newChan:
 		if success {
-			if msg.OperationId == operationArgs.OperationId && msg.ClientId == operationArgs.ClientId && term == msg.Term {
+			if msg.OperationId == operationArgs.OperationId && msg.ClientId == operationArgs.ClientId {
 				reply = msg
+				DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): waitCmdApplyCh:%p get msg\n", kv.me, operationArgs.ClientId, operationArgs.OperationId, &newChan)
 			} else {
 				reply.Err = ErrLeaderOutOfDate
+				DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): ErrLeaderOutOfDate\n", kv.me, operationArgs.ClientId, operationArgs.OperationId)
 			}
 		} else if !success {
 			reply.Err = ErrChanClosed
+			DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): ErrChanClosed\n", kv.me, operationArgs.ClientId, operationArgs.OperationId)
 		}
 	case <-time.After(OperationTimeOut):
 		reply.Err = ErrOperationTimeOut
+		DPrintf("HandleOperation(LEADER:%d Client:%d OperationId:%d): ErrOperationTimeOut\n", kv.me, operationArgs.ClientId, operationArgs.OperationId)
 	}
 
 	return
@@ -173,7 +178,6 @@ func (kv *KVServer) DBExecute(op *OperationArgs) (res OperationReply) {
 	res.Err = OK
 	res.OperationId = op.OperationId
 	res.ClientId = op.ClientId
-	res.Term, _ = kv.rf.GetState()
 	switch op.Type {
 	case GET:
 		if value, exist := kv.db[op.Key]; exist {
