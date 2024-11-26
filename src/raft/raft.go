@@ -433,7 +433,7 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 			rf.lastApplied,
 			false,
 			nil,
-			0,
+			rf.currentTerm,
 			0,
 		}
 		rf.applyChTemp <- applyMsg
@@ -576,6 +576,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 			}
 			if count > len(rf.peers)/2 && rf.log[rf.getRelativeLogIndex(N)].Term == rf.currentTerm { //over half of servers commit, Figure 8
 				rf.commitIndex = N
+				rf.heartBeatTimer.Reset(1 * time.Millisecond)
 			}
 		}
 
@@ -587,7 +588,7 @@ func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *Ap
 				rf.lastApplied,
 				false,
 				nil,
-				0,
+				rf.currentTerm,
 				0,
 			}
 			rf.applyChTemp <- applyMsg
@@ -833,7 +834,7 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	//2B
 	rf.applyCh = applyCh
-	rf.applyChTemp = make(chan ApplyMsg, 1000)
+	rf.applyChTemp = make(chan ApplyMsg, 20000)
 	rf.lastApplied = 0
 	rf.log = make([]LogEntry, 0)
 	rf.log = append(rf.log, LogEntry{
