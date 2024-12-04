@@ -10,10 +10,14 @@ package shardkv
 //
 
 const (
-	OK             = "OK"
-	ErrNoKey       = "ErrNoKey"
-	ErrWrongGroup  = "ErrWrongGroup"
-	ErrWrongLeader = "ErrWrongLeader"
+	OK                 = "OK"
+	ErrNoKey           = "ErrNoKey"
+	ErrWrongGroup      = "ErrWrongGroup"
+	ErrWrongLeader     = "ErrWrongLeader"
+	ErrOpOutOfDate     = "ErrOpOutOfDate"
+	ErrHandleOpTimeOut = "ErrHandleOpTimeOut"
+
+	ErrNotReady = "ErrNotReady" //for MigrateShardRPC
 )
 
 type Err string
@@ -27,6 +31,8 @@ type PutAppendArgs struct {
 	// You'll have to add definitions here.
 	// Field names must start with capital letters,
 	// otherwise RPC will break.
+	ClientId    int64
+	OperationId int64
 }
 
 type PutAppendReply struct {
@@ -36,9 +42,32 @@ type PutAppendReply struct {
 type GetArgs struct {
 	Key string
 	// You'll have to add definitions here.
+	ClientId    int64
+	OperationId int64
 }
 
 type GetReply struct {
 	Err   Err
 	Value string
+}
+
+// MigrateShardArgs RPC that ShardKV leader requests shard's ex-owner for shard's data
+type MigrateShardArgs struct {
+	ConfigNum int
+	ShardNum  int
+}
+
+type MigrateShardReply struct {
+	Err       Err
+	ShardData map[string]string
+}
+
+type AckArgs struct {
+	ConfigNum int
+	ShardNum  int
+}
+
+type AckReply struct {
+	Err     Err
+	Receive bool
 }

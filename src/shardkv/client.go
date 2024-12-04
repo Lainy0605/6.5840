@@ -33,11 +33,19 @@ func nrand() int64 {
 	return x
 }
 
+func (ck *Clerk) getOperationId() int64 {
+	ck.operationId += 1
+	return ck.operationId
+}
+
 type Clerk struct {
 	sm       *shardctrler.Clerk
 	config   shardctrler.Config
 	make_end func(string) *labrpc.ClientEnd
 	// You will have to modify this struct.
+	clientId    int64
+	operationId int64
+	leaderId    int
 }
 
 // the tester calls MakeClerk.
@@ -52,6 +60,11 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 	ck.sm = shardctrler.MakeClerk(ctrlers)
 	ck.make_end = make_end
 	// You'll have to add code here.
+	ck.clientId = nrand()
+	ck.operationId = 0
+	ck.leaderId = 0
+	ck.config = ck.sm.Query(-1)
+
 	return ck
 }
 
@@ -62,6 +75,8 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 func (ck *Clerk) Get(key string) string {
 	args := GetArgs{}
 	args.Key = key
+	args.ClientId = ck.clientId
+	args.OperationId = ck.getOperationId()
 
 	for {
 		shard := key2shard(key)
@@ -82,7 +97,7 @@ func (ck *Clerk) Get(key string) string {
 			}
 		}
 		time.Sleep(100 * time.Millisecond)
-		// ask controler for the latest configuration.
+		// ask controller for the latest configuration.
 		ck.config = ck.sm.Query(-1)
 	}
 
@@ -96,7 +111,8 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 	args.Key = key
 	args.Value = value
 	args.Op = op
-
+	args.ClientId = ck.clientId
+	args.OperationId = ck.getOperationId()
 
 	for {
 		shard := key2shard(key)
@@ -116,7 +132,7 @@ func (ck *Clerk) PutAppend(key string, value string, op string) {
 			}
 		}
 		time.Sleep(100 * time.Millisecond)
-		// ask controler for the latest configuration.
+		// ask controller for the latest configuration.
 		ck.config = ck.sm.Query(-1)
 	}
 }
