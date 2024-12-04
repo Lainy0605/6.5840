@@ -367,7 +367,7 @@ func (kv *ShardKV) MigrateShard(args *MigrateShardArgs, reply *MigrateShardReply
 	} else {
 		shardData := deepCopyMap(kv.DB[args.ShardNum])
 		reply.ShardData = shardData
-		historyResult := kv.historyResult
+		historyResult := deepCopyHistoryResult(kv.historyResult)
 		reply.HistoryResult = historyResult
 		reply.Err = OK
 	}
