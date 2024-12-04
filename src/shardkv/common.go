@@ -58,8 +58,9 @@ type MigrateShardArgs struct {
 }
 
 type MigrateShardReply struct {
-	Err       Err
-	ShardData map[string]string
+	Err           Err
+	ShardData     map[string]string
+	HistoryResult map[int64]*Result
 }
 
 type AckArgs struct {

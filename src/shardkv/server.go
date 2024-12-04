@@ -28,9 +28,10 @@ type Op struct {
 
 	NewConfig shardctrler.Config //for UPDATECONFIG
 
-	ConfigNum int               //for GetShard/GiveShard
-	ShardNum  int               //for GetShard/GiveShard
-	ShardData map[string]string //for GetShard
+	ConfigNum     int               //for GetShard/GiveShard
+	ShardNum      int               //for GetShard/GiveShard
+	ShardData     map[string]string //for GetShard
+	HistoryResult map[int64]*Result //for GetShard
 }
 
 const (
@@ -331,10 +332,11 @@ func (kv *ShardKV) checkAndGetShard() {
 						break
 					} else if reply.Err == OK {
 						getShardOp := Op{
-							OpType:    GetShard,
-							ConfigNum: configNum,
-							ShardNum:  shardNum,
-							ShardData: reply.ShardData,
+							OpType:        GetShard,
+							ConfigNum:     configNum,
+							ShardNum:      shardNum,
+							ShardData:     reply.ShardData,
+							HistoryResult: reply.HistoryResult,
 						}
 						kv.rf.Start(getShardOp)
 						DPrintf("ShardKVServer(CheckAndGetShard<Group[%d] ShardKV[%d]>): request server%s for shard%d [Successfully]\n", kv.gid, kv.me, server, shardNum)
@@ -363,8 +365,10 @@ func (kv *ShardKV) MigrateShard(args *MigrateShardArgs, reply *MigrateShardReply
 	} else if args.ConfigNum < kv.curConfig.Num {
 		reply.Err = OK
 	} else {
-		shardData := kv.deepCopyMap(kv.DB[args.ShardNum])
+		shardData := deepCopyMap(kv.DB[args.ShardNum])
 		reply.ShardData = shardData
+		historyResult := kv.historyResult
+		reply.HistoryResult = historyResult
 		reply.Err = OK
 	}
 
@@ -397,13 +401,23 @@ func (kv *ShardKV) AckReceivedShard(args *AckArgs, reply *AckReply) {
 	return
 }
 
-func (kv *ShardKV) deepCopyMap(oldMap map[string]string) map[string]string {
+func deepCopyMap(oldMap map[string]string) map[string]string {
 	newMap := make(map[string]string, len(oldMap))
 	for key, value := range oldMap {
 		newMap[key] = value
 	}
 
 	return newMap
+}
+
+func deepCopyHistoryResult(oldHistoryResult map[int64]*Result) map[int64]*Result {
+	newHistoryResult := make(map[int64]*Result, len(oldHistoryResult))
+
+	for key, value := range oldHistoryResult {
+		newHistoryResult[key] = value
+	}
+
+	return newHistoryResult
 }
 
 func (kv *ShardKV) checkAndGiveShard() {
@@ -496,10 +510,24 @@ func (kv *ShardKV) ApplyHandler() {
 				DPrintf("ShardKVServer(ApplyHandler<Group[%d] ShardKV[%d]>): Start to execute config command:%v\n", kv.gid, kv.me, op)
 				kv.executeConfigCmd(op, log)
 			}
-		} else if log.SnapshotValid {
 
+			kv.mu.Lock()
+			// 每收到一个log就检测是否需要生成快照
+			if kv.maxraftstate != -1 && kv.rf.GetRaftStateSize() >= kv.maxraftstate/100*90 {
+				// 当达到95%容量时需要生成快照
+				snapShot := kv.PersistSnapshot()
+				kv.rf.Snapshot(log.CommandIndex, snapShot)
+			}
+			kv.mu.Unlock()
+		} else if log.SnapshotValid {
+			kv.mu.Lock()
+			if log.SnapshotIndex >= kv.lastApplied {
+				kv.ReadSnapshot(log.Snapshot)
+				kv.lastApplied = log.SnapshotIndex
+			}
+			kv.mu.Unlock()
 		} else {
-			//TODO
+			DPrintf("ShardKVServer(ApplyHandler<Group[%d] ShardKV[%d]>):Unkown type of Apply Message\n", kv.gid, kv.me)
 		}
 	}
 }
@@ -520,6 +548,7 @@ func (kv *ShardKV) executeClientCmd(op Op, log raft.ApplyMsg) {
 	} else if log.CommandIndex <= kv.lastApplied {
 		return
 	} else {
+		kv.lastApplied = log.CommandIndex
 		needApply := false
 		if history, exist := kv.historyResult[op.ClientId]; exist {
 			if history.OperationId == op.OperationId {
@@ -581,11 +610,16 @@ func (kv *ShardKV) executeConfigCmd(op Op, log raft.ApplyMsg) {
 		}
 	case GetShard:
 		if kv.curConfig.Num == op.ConfigNum && kv.ownedShards[op.ShardNum] == WaitGet {
-			kvMap := kv.deepCopyMap(op.ShardData)
+			kvMap := deepCopyMap(op.ShardData)
 			kv.DB[op.ShardNum] = kvMap
 			kv.ownedShards[op.ShardNum] = Exist
 
 			//TODO
+			for clientId, historyResult := range op.HistoryResult {
+				if ownHistoryResult, exist := kv.historyResult[clientId]; !exist || historyResult.OperationId > ownHistoryResult.OperationId {
+					kv.historyResult[clientId] = historyResult
+				}
+			}
 			DPrintf("ShardKVServer(executeConfigCmd<Group[%d] ShardKV[%d]>): executed GetShard(shardNum:%d, shardData:%v)\n", kv.gid, kv.me, op.ShardNum, op.ShardData)
 		}
 	case GiveShard:
@@ -676,6 +710,7 @@ func StartServer(servers []*labrpc.ClientEnd, me int, persister *raft.Persister,
 
 	kv.applyCh = make(chan raft.ApplyMsg)
 	kv.rf = raft.Make(servers, me, persister, kv.applyCh)
+	kv.ReadSnapshot(persister.ReadSnapshot())
 
 	go kv.ApplyHandler()
 	go kv.getLatestConfig()
